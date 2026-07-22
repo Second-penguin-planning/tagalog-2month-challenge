@@ -1206,8 +1206,20 @@ const QUIZ_LEN = 10;
 
 function lessonById(id){ return ALL_LESSONS.filter(function(l){ return l.id===id; })[0]; }
 function lessonIdx(id){ return LESSON_ORDER.indexOf(id); }
-function unlockDay(id){ return Math.floor(lessonIdx(id)*1.5)+1; }
-function isUnlocked(id, day){ return unlockDay(id) <= day; }
+/* targetDay: a recommended-pace label only (shown in the Lessons list), not a hard gate. */
+function targetDay(id){ return Math.floor(lessonIdx(id)*1.5)+1; }
+/* isUnlocked: progress-based. Lesson k unlocks once every vocab card of lessons 0..k-1
+   has been introduced into the flashcard deck at least once (so eager study, not the
+   calendar, is what advances you - the old version blocked lesson 2+ until a real day passed). */
+function isUnlocked(id){
+  const idx = lessonIdx(id);
+  for(let i=0;i<idx;i++){
+    const prevVocab = VOCAB_CARDS.filter(function(c){ return c.lessonId===LESSON_ORDER[i]; });
+    const allIntroduced = prevVocab.every(function(c){ return !!state.cardState[c.id]; });
+    if(!allIntroduced) return false;
+  }
+  return true;
+}
 
 /* ================= Date / utils ================= */
 function pad(n){ return n<10 ? '0'+n : ''+n; }
@@ -1292,9 +1304,8 @@ function gradeCard(cardId, grade){
 }
 
 function buildSessionQueue(poolCards, poolName, newCap, sessionCap){
-  const day = currentDay();
   const unlockedIds = {};
-  LESSON_ORDER.forEach(function(id){ if(isUnlocked(id, day)) unlockedIds[id]=true; });
+  LESSON_ORDER.forEach(function(id){ if(isUnlocked(id)) unlockedIds[id]=true; });
   const available = poolCards.filter(function(c){ return unlockedIds[c.lessonId]; });
   const today = todayStr();
   const due = [], fresh = [];
@@ -1318,9 +1329,8 @@ function buildSessionQueue(poolCards, poolName, newCap, sessionCap){
 }
 
 function countDue(poolCards, poolName){
-  const day = currentDay();
   const unlockedIds = {};
-  LESSON_ORDER.forEach(function(id){ if(isUnlocked(id, day)) unlockedIds[id]=true; });
+  LESSON_ORDER.forEach(function(id){ if(isUnlocked(id)) unlockedIds[id]=true; });
   const today = todayStr();
   let due=0, fresh=0;
   poolCards.forEach(function(c){
@@ -1341,9 +1351,8 @@ function masteredCount(poolCards){
 
 /* ================= Quiz generation ================= */
 function buildQuizQuestions(n){
-  const day = currentDay();
   const unlockedIds = {};
-  LESSON_ORDER.forEach(function(id){ if(isUnlocked(id, day)) unlockedIds[id]=true; });
+  LESSON_ORDER.forEach(function(id){ if(isUnlocked(id)) unlockedIds[id]=true; });
   const vocabPool = VOCAB_CARDS.filter(function(c){ return unlockedIds[c.lessonId]; });
   const sentPool = SENT_CARDS.filter(function(c){ return unlockedIds[c.lessonId]; });
   const qs = [];
@@ -1417,9 +1426,13 @@ function renderHome(){
   const day = currentDay();
   const dueVocab = countDue(VOCAB_CARDS, 'vocab');
   const dueSent = countDue(SENT_CARDS, 'sent');
-  const newTodayLesson = LESSON_ORDER.filter(function(id){ return unlockDay(id) === Math.min(day, 47); })[0];
+  const currentFocusLesson = LESSON_ORDER.filter(function(id){
+    if(!isUnlocked(id)) return false;
+    const vocab = VOCAB_CARDS.filter(function(c){ return c.lessonId===id; });
+    return vocab.some(function(c){ return !state.cardState[c.id]; });
+  })[0];
   const pct = Math.min(100, Math.round((day/TOTAL_DAYS)*100));
-  const totalUnlocked = LESSON_ORDER.filter(function(id){ return isUnlocked(id, day); }).length;
+  const totalUnlocked = LESSON_ORDER.filter(function(id){ return isUnlocked(id); }).length;
 
   let html = '';
   html += '<div class="card">';
@@ -1428,12 +1441,13 @@ function renderHome(){
   html += '  <div class="muted">'+totalUnlocked+' / '+LESSON_ORDER.length+' レッスン解禁 ・ 2ヶ月中 '+Math.min(day,TOTAL_DAYS)+'日目</div>';
   html += '</div>';
 
-  if(newTodayLesson){
-    const lesson = lessonById(newTodayLesson);
+  if(currentFocusLesson){
+    const lesson = lessonById(currentFocusLesson);
+    const doneVocab = (lesson.v||[]).filter(function(_,i){ return !!state.cardState['v'+lesson.id+'_'+i]; }).length;
     html += '<div class="card" style="border-color:var(--accent)">';
-    html += '  <span class="lesson-badge">今日解禁</span>';
+    html += '  <span class="lesson-badge">現在のレッスン</span>';
     html += '  <h2>第'+displayNum(lesson.id)+'課: '+escapeHtml(lesson.title)+'</h2>';
-    html += '  <p class="muted">新しい単語 '+ (lesson.v||[]).length +'語・例文 '+(lesson.s||[]).length+'個</p>';
+    html += '  <p class="muted">単語 '+doneVocab+' / '+(lesson.v||[]).length+'語 学習済み・例文 '+(lesson.s||[]).length+'個</p>';
     html += '  <button class="btn" data-action="openLesson" data-id="'+lesson.id+'">レッスンを見る</button>';
     html += '</div>';
   }
@@ -1470,15 +1484,16 @@ function displayNum(id){ return (id===241) ? '24-2' : id; }
 
 /* ================= Lessons list & detail ================= */
 function renderLessonsList(){
-  const day = currentDay();
   let html = '<h1 class="page-title">レッスン一覧</h1>';
+  html += '<p class="muted" style="margin-top:-6px;">前のレッスンの単語をすべて学習すると、次のレッスンが解禁されます(カレンダーの日数ではなく学習の進み具合で解禁されます)。</p>';
   ALL_LESSONS.forEach(function(lesson){
-    const unlocked = isUnlocked(lesson.id, day);
+    const unlocked = isUnlocked(lesson.id);
     html += '<div class="card '+(unlocked?'':'locked')+'" data-action="openLesson" data-id="'+lesson.id+'" style="cursor:pointer;">';
     html += '<div class="row"><div>';
     html += '<span class="lesson-badge">第'+displayNum(lesson.id)+'課</span><h2>'+escapeHtml(lesson.title)+'</h2>';
+    html += '<div class="lock-tag">目安 Day '+targetDay(lesson.id)+(unlocked?'':' ・ 前のレッスンを終えると解禁')+'</div>';
     html += '</div>';
-    html += unlocked ? '<span style="font-size:20px;">›</span>' : '<span class="lock-tag">🔒 Day '+unlockDay(lesson.id)+'</span>';
+    html += unlocked ? '<span style="font-size:20px;">›</span>' : '<span style="font-size:18px;">🔒</span>';
     html += '</div></div>';
   });
   return html;
@@ -1710,7 +1725,7 @@ if(isFirstRun){
     + '<h2 style="margin-top:0;">ようこそ！タガログ語 2ヶ月チャレンジ</h2>'
     + '<p class="muted" style="line-height:1.8;">Riri先生のテキスト全31課をもとに、60日間で毎日少しずつ学習します。'
     + '<br><br>①<b>単語フラッシュカード</b>：間隔反復で効率よく暗記<br>②<b>文法クイズ</b>：4択で理解度チェック<br>③<b>会話練習</b>：日本語→タガログ語の瞬発力トレーニング'
-    + '<br><br>レッスンは約1.5日に1課ずつ解禁され、47日目までに全課が解禁、残りの期間は総復習にあてます。毎日開くだけでOKです！</p>'
+    + '<br><br>レッスンは「前のレッスンの単語を一通り学習し終える」と次が解禁される仕組みです。目安は約1.5日に1課ですが、たくさん学習すればどんどん先に進めます。2ヶ月かけて無理なく全31課(32レッスン)を学び切るペースです。</p>'
     + '<button class="btn" id="closeOnboarding">はじめる</button>'
     + '</div>';
   document.body.appendChild(backdrop);
