@@ -1,0 +1,1721 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>タガログ語 2ヶ月チャレンジ</title>
+<style>
+  /* Palette: "Manila" by day (manila-paper warmth + jeepney sunset accent) /
+     "Manila Bay" by night (deep teal dusk + glowing sunset neon) */
+  :root{
+    --bg:#f5efe0; --surface:#fffdf8; --surface2:#ece0c6; --text:#271c14; --text-dim:#7d6a53;
+    --accent:#e0602f; --accent2:#1f6f74; --gold:#e8a53a; --good:#2f8f5b; --warn:#b3791c; --bad:#c0392b;
+    --border:#e2d3af; --shadow:0 2px 10px rgba(90,60,20,0.10);
+    --radius:16px; --accent-ink:#fff8ee;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12191b; --surface:#192225; --surface2:#20302f; --text:#f1ece0; --text-dim:#9db1ae;
+      --accent:#ff7a45; --accent2:#45c8bd; --gold:#ffcf6b; --good:#49d18f; --warn:#ffcf6b; --bad:#ff6b6b;
+      --border:#28383a; --shadow:0 2px 16px rgba(0,0,0,0.4); --accent-ink:#1a1006; }
+  }
+  :root[data-theme="dark"]{ --bg:#12191b; --surface:#192225; --surface2:#20302f; --text:#f1ece0; --text-dim:#9db1ae;
+    --accent:#ff7a45; --accent2:#45c8bd; --gold:#ffcf6b; --good:#49d18f; --warn:#ffcf6b; --bad:#ff6b6b;
+    --border:#28383a; --shadow:0 2px 16px rgba(0,0,0,0.4); --accent-ink:#1a1006; }
+  :root[data-theme="light"]{ --bg:#f5efe0; --surface:#fffdf8; --surface2:#ece0c6; --text:#271c14; --text-dim:#7d6a53;
+    --accent:#e0602f; --accent2:#1f6f74; --gold:#e8a53a; --good:#2f8f5b; --warn:#b3791c; --bad:#c0392b;
+    --border:#e2d3af; --shadow:0 2px 10px rgba(90,60,20,0.10); --accent-ink:#fff8ee; }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; height:100%; overscroll-behavior-y:contain; }
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:"Hiragino Sans","Noto Sans JP","Segoe UI",system-ui,sans-serif;
+    display:flex; justify-content:center;
+  }
+  #app-root{ width:100%; max-width:560px; min-height:100vh; display:flex; flex-direction:column; position:relative; }
+  #view{ flex:1; padding:14px 14px 90px 14px; overflow-y:auto; }
+
+  header.topbar{
+    position:sticky; top:0; z-index:5;
+    background:linear-gradient(100deg, var(--accent), var(--accent2));
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px; box-shadow:var(--shadow);
+  }
+  .brand{ display:flex; flex-direction:column; color:var(--accent-ink); }
+  .brand b{ font-size:15px; letter-spacing:.03em; font-weight:800; text-transform:uppercase; }
+  .brand span{ font-size:11px; color:var(--accent-ink); opacity:.85; font-variant-numeric:tabular-nums; }
+  .streak-pill{
+    display:flex; align-items:center; gap:5px; background:rgba(0,0,0,0.18); color:var(--accent-ink);
+    padding:6px 12px; border-radius:20px; font-size:13px; font-weight:800; white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+
+  nav.bottomnav{
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:560px; display:flex; background:var(--surface);
+    border-top:1px solid var(--border); padding:6px 4px calc(6px + env(safe-area-inset-bottom)) 4px;
+    z-index:10;
+  }
+  nav.bottomnav button{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+    background:none; border:none; color:var(--text-dim); font-size:10.5px; padding:6px 2px; border-radius:10px;
+    font-family:inherit; cursor:pointer;
+  }
+  nav.bottomnav button .ic{ font-size:19px; }
+  nav.bottomnav button.active{ color:var(--accent); background:var(--surface2); }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:var(--shadow); position:relative; }
+  .card h2{ margin:0 0 8px 0; font-size:17px; font-weight:800; letter-spacing:-.01em; text-wrap:balance; }
+  .card h3{ margin:0 0 6px 0; font-size:12.5px; color:var(--text-dim); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+  .muted{ color:var(--text-dim); font-size:12.5px; line-height:1.6; }
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .col{ display:flex; flex-direction:column; gap:10px; }
+
+  .progressbar{ height:8px; border-radius:6px; background:var(--surface2); overflow:hidden; margin:8px 0; }
+  .progressbar > div{ height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:6px; transition:width .3s; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    background:var(--accent); color:#fff; border:none; border-radius:12px;
+    padding:12px 16px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;
+    width:100%;
+  }
+  .btn.secondary{ background:var(--surface2); color:var(--text); }
+  .btn.ghost{ background:transparent; color:var(--accent); border:1.5px solid var(--accent); }
+  .btn.good{ background:var(--good); }
+  .btn.bad{ background:var(--bad); }
+  .btn.warn{ background:var(--warn); color:#241a00; }
+  .btn:disabled{ opacity:.45; }
+  .btn-row{ display:flex; gap:8px; }
+  .btn-row .btn{ width:auto; flex:1; }
+
+  .lesson-badge{ display:inline-block; font-size:10.5px; font-weight:800; color:var(--accent-ink); background:var(--accent); padding:4px 10px; border-radius:6px; margin-bottom:8px; text-transform:uppercase; letter-spacing:.06em; }
+  .locked{ opacity:.5; }
+  .lock-tag{ font-size:11px; color:var(--text-dim); font-variant-numeric:tabular-nums; }
+
+  .flip-card{ perspective:1200px; height:260px; margin-bottom:16px; }
+  .flip-inner{ position:relative; width:100%; height:100%; transition:transform .45s; transform-style:preserve-3d; }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; -webkit-backface-visibility:hidden; backface-visibility:hidden;
+    background:var(--surface); border:1px solid var(--border); border-radius:20px;
+    display:flex; align-items:center; justify-content:center; flex-direction:column; padding:22px; text-align:center;
+    box-shadow:var(--shadow);
+  }
+  .flip-face.back{ transform:rotateY(180deg); }
+  .flip-face .big{ font-size:26px; font-weight:800; line-height:1.35; letter-spacing:-.01em; text-wrap:balance; }
+  .flip-face .small{ font-size:13px; color:var(--text-dim); margin-top:14px; padding-top:14px; border-top:1.5px dashed var(--border); width:80%; }
+  .tap-hint{ position:absolute; bottom:14px; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.06em; }
+  .ticket-tag{
+    position:absolute; top:12px; left:12px; background:var(--surface2); color:var(--text-dim);
+    font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:6px; letter-spacing:.04em;
+  }
+  h1.page-title{ font-size:20px; font-weight:800; letter-spacing:-.01em; margin:4px 0 14px 0; text-wrap:balance; }
+
+  .quiz-opt{
+    display:block; width:100%; text-align:left; background:var(--surface); border:1.5px solid var(--border);
+    border-radius:12px; padding:13px 14px; margin-bottom:9px; font-size:14px; color:var(--text); font-family:inherit; cursor:pointer;
+  }
+  .quiz-opt.correct{ border-color:var(--good); background:rgba(30,142,90,0.12); }
+  .quiz-opt.wrong{ border-color:var(--bad); background:rgba(192,57,43,0.12); }
+
+  .grammar-note{ background:var(--surface2); border-radius:12px; padding:11px 13px; margin-bottom:8px; font-size:13px; line-height:1.7; }
+  .vocab-row{ display:flex; justify-content:space-between; gap:10px; padding:9px 2px; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .vocab-row:last-child{ border-bottom:none; }
+  .vocab-tl{ font-weight:700; }
+  .vocab-en{ color:var(--text-dim); text-align:right; }
+  .sentence-row{ padding:10px 2px; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .sentence-row:last-child{ border-bottom:none; }
+  .sentence-tl{ font-weight:700; margin-bottom:2px; }
+  .sentence-en{ color:var(--text-dim); font-size:12.5px; }
+
+  .empty-state{ text-align:center; padding:40px 10px; color:var(--text-dim); }
+  .empty-state .emoji{ font-size:40px; margin-bottom:10px; }
+
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .stat-box{ background:var(--surface2); border-radius:14px; padding:12px; text-align:center; }
+  .stat-box b{ display:block; font-size:20px; font-variant-numeric:tabular-nums; }
+  .stat-box span{ font-size:11px; color:var(--text-dim); }
+
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-box{ background:var(--surface); border-radius:20px; padding:22px; max-width:420px; width:100%; box-shadow:var(--shadow); max-height:85vh; overflow-y:auto; }
+</style>
+</head>
+<body>
+<div id="app-root">
+  <header class="topbar">
+    <div class="brand"><b>タガログ語 2ヶ月チャレンジ</b><span id="daylabel">Day 1 / 60</span></div>
+    <div class="streak-pill">🔥 <span id="streakcount">0</span></div>
+  </header>
+  <div id="view"></div>
+  <nav class="bottomnav">
+    <button data-view="home"><span class="ic">🏠</span>ホーム</button>
+    <button data-view="cards"><span class="ic">🗂️</span>単語</button>
+    <button data-view="quiz"><span class="ic">✏️</span>文法</button>
+    <button data-view="talk"><span class="ic">💬</span>会話</button>
+    <button data-view="lessons"><span class="ic">📚</span>レッスン</button>
+  </nav>
+</div>
+<script>
+// Extracted lesson data batch: Lessons 1-5
+// v = vocab [tagalog, english], g = grammar notes (string array), s = example sentences [tagalog, english]
+const LESSONS_1_5 = [
+{
+  id:1, title:"Greetings and Self-Introduction",
+  v:[
+    ["Kumusta?","How are you?"],
+    ["Magandang umaga","Good morning"],
+    ["Magandang hapon","Good afternoon"],
+    ["Magandang gabi","Good evening"],
+    ["Paalam","Goodbye"],
+    ["Salamat","Thank you"],
+    ["Ako si [Name].","I am [Name]."],
+    ["Taga-[Place] ako.","I am from [Place]."],
+    ["Ikaw?","And you?"],
+    ["Oo / Hindi","Yes / No"]
+  ],
+  g:[
+    "\"Maganda\" means beautiful, so greetings like Magandang umaga literally mean 'beautiful morning'.",
+    "Add 'po' to be more polite/respectful: Kumusta po?, Salamat po.",
+    "Vowels: a=father, e=bet, i=machine, o=go, u=moon.",
+    "Japanese speakers often turn Tagalog 'L' into 'R' (Salamat -> Saramat) since Japanese lacks a distinct L sound."
+  ],
+  s:[
+    ["Kumusta po kayo?","How are you, sir/madam? (formal)"],
+    ["Ako si Maria. Taga-Osaka ako.","I am Maria. I am from Osaka."],
+    ["Magandang umaga po!","Good morning, sir/madam!"]
+  ]
+},
+{
+  id:2, title:"Polite Forms & Common Expressions",
+  v:[
+    ["Mabuti po.","Fine/good, sir/madam."],
+    ["Mabuti naman po / Mabuti rin po","Fine, too, sir/madam."],
+    ["Opo","Yes (formal/polite)"],
+    ["Paumanhin po","Excuse me / sorry (apologize, bumped into someone)"],
+    ["Pakiraan po","Excuse me (asking to pass through)"],
+    ["Mawalang-galang po","Excuse me (asking to be heard)"],
+    ["Patawad po","I'm sorry (for causing hurt/injury)"],
+    ["Pasintabi po","Pardon (warning something may offend)"],
+    ["Hindi ko alam. (Di ko alam.)","I don't know."],
+    ["Ayaw ako. (Ayoko.)","I don't like."],
+    ["Bahala na!","Come what may!"],
+    ["Konti lang","Just a little."],
+    ["Minsan.","Once in a while."],
+    ["Gising na!","Wake up!"],
+    ["Hindi bale!","Never mind!"],
+    ["Teka! (Hintay ka!)","Wait a moment!"],
+    ["Dali ka! (Magmadali ka!)","Hurry up!"],
+    ["Maraming salamat.","Thank you very much."],
+    ["Ano po?","What did you say, sir/madam?"],
+    ["Saka na.","Later."],
+    ["Sandali lang.","Just a moment."],
+    ["Sayang!","What a pity!"],
+    ["Tama na.","That's enough / all right."],
+    ["Tara na. (Tayo na.)","Let's go."],
+    ["Totoo ba?","Is it true?"],
+    ["Marahil / Siguro.","Maybe."]
+  ],
+  g:[
+    "'Po' shows respect to elders, authority figures, or strangers; not used by an older person to a younger one.",
+    "Greetings from morning to evening: Magandang araw/umaga/tanghali/hapon/gabi po.",
+    "Kumusta ka? (casual) vs Kumusta po kayo? (formal), derived from Spanish 'Cómo está'."
+  ],
+  s:[
+    ["Kumusta po kayo? - Mabuti po.","How are you sir? - Fine, sir."],
+    ["Paumanhin po.","Excuse me/sorry (bumped into someone)."],
+    ["Sandali lang po.","Just a moment, sir/madam."]
+  ]
+},
+{
+  id:3, title:"Articles Si/Sina, Ang/Ang Mga, Sentence Order",
+  v:[
+    ["marunong","intelligent"],
+    ["bata","young / child"],
+    ["lungsod","city"],
+    ["magkapatid","siblings"],
+    ["malinis","clean"],
+    ["sapatos","shoes"],
+    ["lugar","place"],
+    ["mahal","expensive"],
+    ["bahay","house"],
+    ["aso","dog"],
+    ["kumakain","is/are eating"],
+    ["mainit","hot"],
+    ["pusa","cat"],
+    ["naglulto","is/are cooking"]
+  ],
+  g:[
+    "Si = singular article before a person's name (Si Ruth ay babae). Sina = plural, before two+ persons' names (Sina Helen at Tom ay mababait).",
+    "Ang = article before a single thing/place (Ang bata ay mabait). Ang mga (\"ma-nga\") = plural things/places (Ang mga bata ay mababait).",
+    "Subject-predicate order: Subject + ay + predicate (Ang bahay ay malaki - The house is big). Emphasis on subject.",
+    "Inverted order: Predicate + subject, no 'ay' used (Malaki ang bahay). Emphasis on predicate. This is more common in everyday speech. For plural subjects use 'mga' not 'ang mga' in inverted order."
+  ],
+  s:[
+    ["Si Ruth ay maganda.","Ruth is pretty."],
+    ["Sina Helen at Tom ay mababait.","Helen and Tom are good."],
+    ["Ang mga sapatos ay malilinis.","The shoes are clean."],
+    ["Malaki ang bahay.","The house is big. (inverted)"],
+    ["Mabait si Peter.","Peter is good. (inverted)"]
+  ]
+},
+{
+  id:4, title:"Personal Pronouns & Demonstratives (ito/iyan/iyon)",
+  v:[
+    ["ako","I"],
+    ["kami","we (excludes listener)"],
+    ["tayo","we (includes listener)"],
+    ["ikaw / ka","you (singular)"],
+    ["kayo","you (plural/polite)"],
+    ["siya","he/she"],
+    ["sila","they"],
+    ["ito","this (near speaker)"],
+    ["iyan","that (near listener)"],
+    ["iyon","that (far from both)"]
+  ],
+  g:[
+    "Akó=I; linked with 'ay' at sentence start, shortened to 'y after vowels (Ako'y...).",
+    "Kami = we excluding listener; Tayo = we including listener.",
+    "Ikaw used at sentence start; shortened to 'ka' in inverted order.",
+    "Siya=he/she (singular); Sila=they (plural).",
+    "Ito(this, near speaker), Iyan(that, near listener), Iyon(that, far from both) - all linked with ay, dropped in inverted order.",
+    "Plural demonstratives use ang mga: Ang mga ito ay mababait.",
+    "Ito/iyan/iyon can modify a noun as 'this/that X': Ang mesang ito ay malinis (This table is clean)."
+  ],
+  s:[
+    ["Ako ay si John.","I am John."],
+    ["Kami'y magkapatid.","We are siblings (excl.)."],
+    ["Tayo ay sina John at Mary.","We are John and Mary (incl.)."],
+    ["Ito'y si John.","This is John."],
+    ["Malaki iyon.","That is big (far)."]
+  ]
+},
+{
+  id:5, title:"Ligatures -ng, -g, na (Linking Words)",
+  v:[
+    ["mapagbigay","generous"],
+    ["hangal","fool"],
+    ["pagod","tired"],
+    ["inapi","maltreated"],
+    ["sariwa","fresh"],
+    ["maasim","sour"],
+    ["tahimik","quiet"],
+    ["malinaw","clear"],
+    ["matapang","brave"],
+    ["bundok","mountain"],
+    ["binata","bachelor"],
+    ["dalaga","unmarried woman"],
+    ["masipag","industrious"],
+    ["mabilis","fast"],
+    ["marumi","dirty"],
+    ["madilim","dark"],
+    ["mayaman","rich"],
+    ["payat","thin"],
+    ["mataba","fat"],
+    ["maitim","black"],
+    ["maputi","whitish"],
+    ["maingay","noisy"],
+    ["tamad","lazy"],
+    ["matamis","sweet"]
+  ],
+  g:[
+    "Ligatures link two adjacent words with no meaning of their own, showing one modifies the other.",
+    "-ng suffix attaches to words ending in vowels: malaki+ng+bahay = malaking bahay (big house).",
+    "-g suffix attaches to words ending in consonant 'n': mayaman+g+lalaki = mayamang lalaki (rich man).",
+    "na is used after words ending in consonants other than n: maasim + na + mangga = maasim na mangga (sour mango).",
+    "Applies to noun+noun, noun+verb, adjective+verb, verb+adverb, adjective+adjective(repeated for superlative, e.g. malinaw na malinaw = very clear), noun+possessive pronoun (exception: aklat ko, bahay namin)."
+  ],
+  s:[
+    ["Ang malaking bahay ay isang paaralan.","The big house is a school."],
+    ["Ang mayamang lalaki ay mapagbigay.","The rich man is generous."],
+    ["Kumain siya ng maasim na mangga.","He/she ate a sour mango."],
+    ["Magandang ang tahimik na bata.","The quiet child is beautiful."],
+    ["Malinaw na malinaw ang utos niya.","His/her command is very clear."]
+  ]
+}
+];
+// Extracted lesson data batch: Lessons 6-10
+const LESSONS_6_10 = [
+{
+  id:6, title:"Possessives: ni/ng, akin/iyo/kaniya, nito/niyan/niyon",
+  v:[
+    ["damit","clothes"],["kotse","car"],["gamot","medicine"],["pagkain","food"],
+    ["luma","old"],["paaralan","school"],["malamig","cold"],["madumi","dirty"],
+    ["bago","new"],["malinis","clean"],["matanda","old (person)"],["baha","flood"],
+    ["marami / madami","many"],
+    ["akin / ko","mine / my"],["iyo / mo","yours / your"],["kaniya / niya","his-her"],
+    ["amin / namin","ours (excl.) "],["atin / natin","ours (incl.)"],
+    ["inyo / ninyo","yours (plural)"],["kanila / nila","theirs"],
+    ["nito","of this (person)"],["niyan","of that (near listener)"],["niyon","of that (far)"]
+  ],
+  g:[
+    "Ni = possessive word before a proper noun (name): ang bahay ni Maria = Maria's house. Object possessed comes before owner.",
+    "Ng = possessive word before a common noun: ang lapis ng guro = the teacher's pencil.",
+    "Plural: nina (for names, e.g. nina Maria at Pedro), ng mga (for common nouns, e.g. ng mga lalaki).",
+    "Possessive pronouns table: akin/ko(my), iyo/mo(your), kaniya-kanya/niya(his-her), amin/namin(our excl.), atin/natin(our incl.), inyo/ninyo(your pl.), kanila/nila(their). Long form (akin, iyo...) goes BEFORE the noun with a ligature; short form (ko, mo, niya...) goes AFTER the noun.",
+    "Ex: Ang aking bahay ay malaki. = Ang bahay ko ay malaki. (My house is big.)",
+    "Nito/niyan/niyon (possessive forms of ito/iyan/iyon) always stay AFTER the noun, even in inverted sentences: Ang bahay nito ay malaki / Malaki ang bahay nito."
+  ],
+  s:[
+    ["Ang bahay ni Maria.","The house of Maria / Maria's house."],
+    ["Ang mga damit ng mga bata.","The clothes of the children."],
+    ["Ang báhay ko ay malaki. / Ang áking báhay ay malakí.","My house is big."],
+    ["Malínis ang sapátos niyá.","His/her shoes are clean."],
+    ["Ang bahay nito ay malaki.","The house of this person is big."],
+    ["Ang kanilang kotse ay bago.","Their car is new."]
+  ]
+},
+{
+  id:7, title:"Question Words (Sino, Ano, Alin, Gaano, Paano, Bakit, Kailan, Saan, Ilan, Magkano, Kanino)",
+  v:[
+    ["sino","who"],["ano","what"],["alin","which"],["gaano","how (degree/quality)"],
+    ["paano","how (process)"],["bakit","why"],["kailan","when"],["saan","where (of an action)"],
+    ["nasaan","where (location of person/thing)"],["ilan","how many"],["magkano","how much"],
+    ["kanino","whose / to-for whom"],
+    ["malaman","to know"],["gusto","to like/want"],["nakatira","live/reside"],
+    ["simbahan","church"],["galit","angry"],["dumating","arrived"],["tao","person"],["pelikula","movie"]
+  ],
+  g:[
+    "14 question words in Tagalog correspond to who/what/which/how/why/when/where/whose.",
+    "Plural question words are formed by duplication: 2-syllable words duplicate fully (sino->sinu-sino, alin->alin-alin); 3+ syllable words duplicate only first two syllables (kanino->kani-kanino, magkano->magka-magkano); final 'o' becomes 'u' in the duplicated part (ano->anu-ano).",
+    "Nasaan and bakit are never duplicated (location/reason can't be plural).",
+    "Kanino requires a possessive-pronoun answer (akin, kaniya, kanila...).",
+    "Ito/iyan can shorten to 'to/'yan in casual questions: Sino 'yan? (Who's that?), Kanino 'to? (Whose is this?)",
+    "Ba often appears in yes/no questions: Gusto mo ba ito? (Do you like this?)"
+  ],
+  s:[
+    ["Sino ba kayo?","Who are you?"],
+    ["Ano ang pangalan ninyo?","What is your name?"],
+    ["Alin ba ang iyong gusto?","Which do you like?"],
+    ["Gaano kalaki ang Pilipinas?","How large is the Philippines?"],
+    ["Paano mo malalaman?","How will you know?"],
+    ["Bakit siya galit?","Why is he/she angry?"],
+    ["Kailan kayo dumating sa Pilipinas?","When did you arrive in the Philippines?"],
+    ["Saan kayo nakatira?","Where do you live?"],
+    ["Ilan ang anak ninyo?","How many children do you have?"],
+    ["Magkano ang aklat?","How much is the book?"],
+    ["Kanino ang bahay na iyan?","Whose house is that?"]
+  ]
+},
+{
+  id:8, title:"-Um- and Mag- Verb Forms (Active Voice)",
+  v:[
+    ["magtanong","to ask a question"],["aral / mag-aral","to study"],["uminom","to drink"],
+    ["magsayaw","to dance"],["magbayad","to pay"],["tumawag","to call"],
+    ["pumunta","to go to a place"],["umalis","to leave"],["dumating","to arrive"],
+    ["kumain","to eat"],["umupo","to sit"],["sumulat","to write"],["bumasa","to read"],
+    ["humingi","to ask for"],["gumawa","to do/make"],["lumangoy","to swim"],["umiyak","to cry"],
+    ["bumili","to buy"],["kumanta / umawit","to sing"],["tumugtog","to play an instrument"],
+    ["magsalita","to speak"],["mag-usap","to converse"],["magsulat","to write"],
+    ["magluto","to cook"],["maglaro","to play"]
+  ],
+  g:[
+    "-um- and mag- verbs = active voice, emphasize the DOER of the action. Some roots take only -um- (alis->umalis), some only mag- (labá->maglaba), some take both with different nuance: -um- form = casual/one-time action (kumakain=is eating), mag- form = frequent/intense action (nagkakakain=always eating). Also -um- = action toward the doer (bumibili=buying for self), mag- = action away from doer (magbibili=selling).",
+    "-um- conjugation, vowel-initial root (alis->umalis): Infinitive/Imperative/Past = umalis; Present = umaalis (duplicate 1st syllable); Future = aalis.",
+    "-um- conjugation, consonant-initial root (kain->kumain): infix -um- after 1st consonant. Infinitive/Imperative/Past = kumain; Present = kumakain; Future = kakain.",
+    "mag- conjugation, vowel-initial root (aral->mag-aral, glottal stop hyphen): Infinitive/Imperative = mag-aral; Past = nag-aral; Present = nag-aaral; Future = mag-aaral.",
+    "mag- conjugation, consonant-initial root (luto->magluto): Infinitive/Imperative = magluto; Past = nagluto; Present = naglulutò; Future = maglulutò.",
+    "Two sentence patterns: (1) Verb + Doer + Object (Kumain si Peter ng kanin); (2) Verb + Object + Doer (Kumain ng kanin si Peter). With pronoun subjects (siya, sila) pattern 1 is preferred."
+  ],
+  s:[
+    ["Dumating si Helen kahapon.","Helen arrived yesterday."],
+    ["Sumúsulat si Gng. Smith.","Mrs. Smith is writing."],
+    ["Nagsásalita ang bata.","The child is talking."],
+    ["Naglaláro ang aking mga anak.","My children are playing."],
+    ["Naglutò ba kayó ng kánin?","Did you cook rice?"],
+    ["Bumása táyo ng isáng kuwento.","Let us read a story."],
+    ["Umíinom ng gátas ang batà.","The child is drinking milk."],
+    ["Kumáin si Peter ng kánin.","Peter ate rice."]
+  ]
+},
+{
+  id:9, title:"-In- Verb Forms (Object-Focus Passive Voice)",
+  v:[
+    ["sabihin","to tell"],["baguhin","to change"],["pasukin","to enter"],["gisingin","to awaken"],
+    ["alisin","to remove"],["basahin","to read"],["awitin","to sing"],["lutuin","to cook (irreg.)"],
+    ["mahalin","to love"],["laruin","to play"],["gamutin","to cure"],["ganutin","to awaken"],
+    ["sulatin","to write"],["kanin","to eat (irreg.)"],["dalhin","to bring/carry (irreg.)"],
+    ["patayin","to kill / put out a flame"],["batiin","to greet"],["puriin","to praise"],
+    ["linisin","to clean"],["bilangin","to count"],["tawagin","to call"],["inumin","to drink"]
+  ],
+  g:[
+    "-in- verbs are passive: they emphasize the OBJECT/receiver of the action, which becomes the subject. Ex: Binasa ko ang libro (I read the book) - the object (ang libro) is necessary and emphasized, unlike active Bumasa ako ng libro. Tagalogs generally prefer this -in- passive form in daily speech.",
+    "Vowel-initial root, suffix form (alis->alisin): Infinitive/Imperative = alisín; Past = inalís (prefix in-); Present = inaalis; Future = aalisin.",
+    "Consonant-initial root, -in suffixed at the end (basa->basahin): Infinitive/Imperative = basáhin; Past = binása (infix -in- after 1st consonant); Present = binábasa; Future = babasahín.",
+    "Rule: -in is suffixed to roots ending in a consonant (alis->alisin, pasok->pasukin) or roots with a final glottal stop ending in vowel (sira->sirain, puno->punuin). -Hin is suffixed to roots without glottal stop ending in a vowel (basa->basahin, bili->bilhin, sabi->sabihin).",
+    "Irregular: (1) stressed final syllable roots drop the final vowel before -hin: bili->bilhin, dala->dalhin. (2) roots with last-syllable i/o (VC/CVC) drop that i/o before -in: kain->kanin, sunod->sundin, dakip->dakpin. (3) roots starting with l/w/y use prefix ni- instead of infix for past/present: luto->niluto, walis->niwalis, yari->niyari."
+  ],
+  s:[
+    ["Binasa ko ang libro.","I read the book."],
+    ["Sabihin mo sa akin.","Tell it to me."],
+    ["Gisingin mo ang bata.","Wake up the child."],
+    ["Kanin natin ang isda.","Let's eat the fish."],
+    ["Dalhin mo ang aklat.","Bring the book."],
+    ["Linisin mo ang bahay.","Clean the house."]
+  ]
+},
+{
+  id:10, title:"Review: Greetings, Expressions, Articles, Pronouns, Question Words (practice slide deck)",
+  v:[
+    ["magandang tanghali po","good noon, sir/madam"],
+    ["magandang araw po","good day, sir/madam"],
+    ["pakiraan po","excuse me (passing between)"],
+    ["mawalang-galang po","excuse me (interrupting)"],
+    ["patawad po","sorry (for hurting someone)"],
+    ["pasintabi po","pardon (about to say something unwelcome)"],
+    ["sige na","go on / go ahead"],
+    ["tulog na","go to sleep"],
+    ["ayoko","I don't like/want (contraction of ayaw ko)"],
+    ["tahimik kayo","please be quiet (plural)"],
+    ["magkapatid","siblings"],["gutom","hungry"],["bansa","country"]
+  ],
+  g:[
+    "This lesson is a review/practice deck: translation drills covering Lessons 1-9 (greetings, si/sina, ang/ang mga, personal pronouns, demonstratives, ligatures, possessives, question words).",
+    "Day/date pattern: Anong araw at petsa ngayon? Ngayon ay Huwebes at ika-dalawampu't isa ng Agosto. (What day and date is it today? Today is Thursday, August 21st.) Kahapon=yesterday, Bukas=tomorrow."
+  ],
+  s:[
+    ["Matalino si Hiro. / Si Hiro ay matalino.","Hiro is intelligent."],
+    ["Sina Hiro at Sayu ay mga mababait na bata.","Hiro and Sayu are good children."],
+    ["Mataba ang pusa. / Ang pusa ay mataba.","The cat is fat."],
+    ["Ang mga pusa at aso ay mabubuting kaibigan.","The cats and dogs are good friends."],
+    ["Masipag ako. / Ako ay masipag.","I am hard working."],
+    ["Gutom kami. Pupunta tayo sa Pilipinas.","We(excl.) are hungry. We(incl.) are going to the Philippines."],
+    ["Ito ay telepono. Iyan ay bote ng tubig. Iyon ay manika.","This is a phone. That is a water bottle. That (far) is a doll."],
+    ["Ang malaking bahay ay isang eskwela.","The big house is a school."],
+    ["Sino ang guro? Ano ang pangalan mo?","Who is the teacher? What is your name?"],
+    ["Kailan ka dumating sa Japan? Saan ka nakatira?","When did you arrive in Japan? Where do you live?"]
+  ]
+}
+];
+// Extracted lesson data batch: Lessons 11 (+11-1 practice), 12, 13
+const LESSONS_11_13 = [
+{
+  id:11, title:"Pseudo-Verbs: Dapat, Gusto, Ibig, Maaari/Puwede, Kailangan, Ayaw",
+  v:[
+    ["dapat","must / should / has to"],
+    ["maaari / puwede","can / may / could"],
+    ["kailangan","needs to / is necessary to"],
+    ["ibig / gusto","likes / wants / desires"],
+    ["ayaw","does not like / does not want"],
+    ["mag-aral","to learn/study"],["estudyante","student"],["tinapay","bread"],
+    ["baka","cow / beef"],["kaibigan","friend"],["magulang","parent"],["dalandan","orange (fruit)"],
+    ["balut","steamed duck embryo (food)"]
+  ],
+  g:[
+    "Pseudo-verbs precede a main verb and modify its meaning (must/can/want/need/dislike). Main verb after a pseudo-verb always stays in INFINITIVE form only, never present or future: Dapat kumain (correct) vs Dapat kumakain / Dapat kakain (incorrect).",
+    "Ligature -g/-ng links the pseudo-verb to what follows: Kailangang punuin mo... For ibig, ayaw, dapat before the main verb directly, a ligature isn't required, but a ligature IS required after any pronoun that follows the pseudo-verb.",
+    "Ibig/Gusto + short possessive pronoun (ko, mo, niya) + ligature, placed BETWEEN the pseudo-verb and the main verb: Ibig kong mag-aral ng Tagalog (I want to learn Tagalog). Wrong order breaks the sentence.",
+    "Other pseudo-verbs (dapat, maaari, kailangan) use a nominative pronoun (ako, siya) + ligature with an active -um-/mag- verb, but a possessive pronoun (ko, niya) + ligature with a passive -in- verb: Dapat siyang uminom ng gatas / Dapat niyang inumin ang gatas.",
+    "A pseudo-verb ending in a consonant other than n needs no suffix (Ibig uminom...); one ending in a vowel needs the -ng suffix (Gustong uminom...)."
+  ],
+  s:[
+    ["Dapat kumain ng gulay ang mga bata.","The children should eat their vegetables."],
+    ["Puwedeng lutuin ang baka.","(You) may cook the beef."],
+    ["Maaari kayong lumakad na.","You (pl.) may go already."],
+    ["Ayaw nilang uminom ng gatas.","They do not like to drink milk."],
+    ["Kailangang maligo tayo araw-araw.","We need to bathe every day."],
+    ["Gusto kong mag-aral ng Tagalog.","I like to learn Tagalog."],
+    ["Dapat tayong kumain ng gulay araw-araw.","We must eat vegetables every day."],
+    ["Gusto mo bang bumili ng dalandan?","Do you like to buy oranges?"],
+    ["Kailangan ng taong may sakit matulog.","The sick person needs to sleep."],
+    ["Gusto kong manuod ng sine.","I want to watch a movie."]
+  ]
+},
+{
+  id:12, title:"Ma- and Maka- Verb Forms (Ability / Involuntary Action)",
+  v:[
+    ["matulog","to sleep"],["magutom","to be hungry"],["makinig","to listen"],["mahiga","to lie down"],
+    ["matuwa","to be delighted"],["mamatay","to die"],["maligo","to take a bath"],["magalit","to be angry"],
+    ["mahiya","to be ashamed"],["maupo","to sit"],["matakot","to be afraid"],["malungkot","to be sad"],
+    ["mahiyain","shy"],["makita","to be seen / able to see"],["makain","to be able to eat"],
+    ["maalala","to be able to remember"],["makuha","to be able to get"],["marinig","to be able to hear"],
+    ["mabili","to be able to buy/sellable"],["masunog","to be burned"],["mabasa","to be able to read"],
+    ["mabasag","to be broken"],["makatulog","to be able to sleep"],["makaligo","to be able to bathe"],
+    ["makabuhay","to be able to give life"],["makakita","to be able to see"],["makakain","to be able to eat"],
+    ["pag-asa","hope"],["nakahiga","lying down"],["maysakit","sick"],["araw-araw","every day"],["putok / paputok","explosion / fireworks"]
+  ],
+  g:[
+    "Ma- = ability/state. Intransitive ma- verbs (no object) are active: matulog (sleep). Ex: matulog->natulog(past)->natutulog(pres)->matutulog(fut).",
+    "Transitive ma- verbs (need object) are passive and take a possessive-pronoun subject, like -in- verbs: makita (to be seen) -> nakita(past)->nakikita(pres)->makikita(fut).",
+    "Maka- = always active, expresses capability, only from action verbs (not emotion verbs): makatulog(be able to sleep)->nakatulog(past)->nakatutulog(pres)->makatutulog(fut).",
+    "Stressed má- / maká- (accent shifts, kept in ALL tenses) = unintentional/accidental action: mákita(seen by accident), mábasag(broken accidentally), mákain(eaten by accident), mábangga(bumped into accidentally), mápatay(killed accidentally). Pattern: mátulog->nátulog->nátutulog->mátutulog.",
+    "Stressed maká- doubles the 2nd syllable in present/future: makátulog->nakátulog(past)->nakákatulog(pres)->makákatulog(fut). Ex: makábili(buy w/o prior intent), makákita(see by chance), makábangga(bump accidentally)."
+  ],
+  s:[
+    ["Ang mga bata ay dapat matulog nang maaga.","Children should sleep early."],
+    ["Nagutom ako kagabi pagkatapos mag-aral.","I got hungry last night after studying."],
+    ["Nakita ko si Mary sa palengke kahapon.","I saw Mary in the market yesterday."],
+    ["Makukuha mo na ang iyong suweldo.","You can get your salary now."],
+    ["Nakatulog kagabi ang maysakit.","The sick person was able to sleep last night."],
+    ["Hindi ako makaligo kung malamig.","I cannot take a bath when it is cold."],
+    ["Ang pag-asa ay nakabubuhay.","Hope is able to give life."],
+    ["Nakapulot ako ng pera.","I accidentally picked up money."],
+    ["Nabangga niya ang kotse.","He/she accidentally bumped the car."],
+    ["Nakakabasa na ako ng Tagalog na bibliya.","I can now read the Tagalog bible."]
+  ]
+},
+{
+  id:13, title:"Maging - To Be / To Become",
+  v:[
+    ["maging mabait","to become/be good"],["maging Pilipino","to become/be Filipino"],
+    ["maging masama","to become/be bad"],["maging guro","to become/be a teacher"],
+    ["maging abugado","to become/be a lawyer"],["maging tahimik","to become/be quiet"],
+    ["maging mayaman","to become/be rich"],["maging bulag","to become/be blind"],
+    ["kapitbahay","neighbor"],["malusog","healthy"],["tahimik","quiet/peaceful"],
+    ["panahon","weather"],["maingay","noisy"],["bulag","blind"],["pamilya","relative/family"],
+    ["Taglagas","autumn/fall"],["Tagsibol","spring"],["hating-gabi","12 midnight"],
+    ["madaling araw","dawn"],["tanghali","12 noon"],["Linggo","Sunday"],["linggo","week"],
+    ["ngayong linggo","this week"],["susunod na linggo","next week"]
+  ],
+  g:[
+    "Maging (\"to be/to become\") + noun/adjective expresses change from one state to another. Conjugation: Infinitive/Imperative=maging mabait; Past=naging mabait; Present=nagiging mabait; Future=magiging mabait.",
+    "The noun/adjective following maging typically carries its own ma- prefix if it's an adjective root (maging mabait, maging masama).",
+    "Common pattern: Gusto kong maging [profession] = I want to become a [profession]."
+  ],
+  s:[
+    ["Ang anak niya ay nagiging mabait na ngayon.","Her/his child is becoming good-behaved now."],
+    ["Ang aking kaibigan ay magiging mayaman na.","My friend will soon become rich."],
+    ["Kailangang maging malusog ang lahat ng mga bata.","All children need to be healthy."],
+    ["Nagiging tahimik na ang aming bahay.","Our house is becoming quiet now."],
+    ["Gusto kong maging guro.","I want to become a teacher."],
+    ["Ayaw mo bang maging doktor?","Don't you want to become a doctor?"],
+    ["Nagiging masama ang panahon.","The weather is getting worse."],
+    ["Mahirap maging bulag.","It is difficult to become blind."],
+    ["Magiging maulan ngayong linggo.","It will be rainy this week."],
+    ["Ang pamilya ko ay magiging masaya.","My family will be happy."]
+  ]
+}
+];
+// Extracted lesson data batch: Lessons 14-18
+const LESSONS_14_18 = [
+{
+  id:14, title:"Magkaroon - To Have",
+  v:[
+    ["magkaroon","to have"],["anak na kambal","twins"],["ubo","cough"],["bisita","visitor"],
+    ["radyo","radio"],["trabaho","work"],["anay","termite"],["tanim","plant (n.) / to plant (v.)"],
+    ["negosyo","business"],["may / mayroon / meron","there is / to have (no full tense forms)"]
+  ],
+  g:[
+    "Magkaroon = to have. Formula: magkaroon + ng + noun, or shortened magka- + noun. Ex: magkaroon ng pera = magkapera (to have money).",
+    "Conjugation: Infinitive=magkaroon ng pera; Past=nagkaroon ng pera / nagkapera; Present=nagkakaroon ng pera / nagkakapera; Future=magkakaroon ng pera / magkakapera.",
+    "Unlike magkaroon, may and mayroon have NO tense forms (except may+verb). Meron is a common casual variant of mayroon.",
+    "Subject introduced by si/ang can go after magkaroon or after the object, meaning unchanged: Nagkaroon si Maria ng aso = Nagkaroon ng aso si Maria (Maria had a dog).",
+    "Negative: hindi + nagkaroon: Hindi nagkaroon si Maria ng aso (Maria did not have a dog)."
+  ],
+  s:[
+    ["Nagkaroon siya ng anak na kambal.","She had twins."],
+    ["Nagkakaroon ako ng ubo kapag malamig.","I have a cough when the weather is cold."],
+    ["Magkakaroon kami ng bisita.","We will have visitors."],
+    ["Nagkaroon ng sakit ang bata.","The child got sick."],
+    ["Nagkakaroon ng anay ang bahay.","The house has termites."],
+    ["Magkakaroon si Pedro ng trabaho.","Pedro will have a job."],
+    ["Hindi nagkakaroon ng bulaklak ang tanim.","The plant does not bear flowers."],
+    ["Hindi sila nagkaroon ng bahay.","They did not have a house."],
+    ["Magkakaroon sila ng magandang bahay sa Quezon City.","They will have a pretty house in Quezon City."],
+    ["Gusto kong magkaroon ng mabuting kaibigan.","I would like to have a good friend."]
+  ]
+},
+{
+  id:15, title:"Review: Pseudo-verbs, Ma-/Maka-, Maging (practice with Japanese translations)",
+  v:[
+    ["makapag-aral","to be able to study"],["makakita","to be able to see"],["makakain","to be able to eat"],
+    ["makatulog","to be able to sleep"],["masaktan","to get hurt / be hurt"],["makasama","to be able to be with / accompany"],
+    ["maanghang","spicy"],["responsable","responsible"],["pagsusulit","exam"],["pumasa","to pass"]
+  ],
+  g:[
+    "Review drills mixing pseudo-verbs (dapat/maaari/puwede/kailangan/ibig/gusto/ayaw), ma-/maka- ability verbs, and maging (naging/nagiging/magiging) plus magkaroon (nagkaroon/nagkakaroon/magkakaroon) across translation and fill-in-the-blank exercises.",
+    "Key distinction reinforced: dapat=must/should, kailangan=need to, gusto/ibig=want/like, ayaw=don't want/like, maaari/puwede=may/can."
+  ],
+  s:[
+    ["Kumain ka na. Kailangan mong uminom ng tubig pagkatapos.","You've eaten. You need to drink water afterward."],
+    ["Gusto mo bang pumunta sa mall bukas?","Do you want to go to the mall tomorrow?"],
+    ["Siya ay masipag at laging gumagawa ng kanyang trabaho dahil gusto niyang maging responsable.","He/She is hardworking and always does his/her work because he/she wants to be responsible."],
+    ["Hindi ko gusto kumain ng maanghang na pagkain.","I don't like to eat spicy food."],
+    ["Ang bata ay pagod na, kaya dapat siyang matulog nang maaga.","The child is tired, so he/she should sleep early."],
+    ["Nag-aral siya nang mabuti dahil gusto niyang pumasa sa pagsusulit.","He/She studied hard because he/she wants to pass the exam."],
+    ["Noong bata pa siya ay naging mahiyain siya.","When she was a child, she was shy."],
+    ["Sa bawat taon, si Ana ay nagiging mas responsable sa kanyang mga gawain.","Every year, Ana is becoming more responsible in her tasks."],
+    ["Sa hinaharap, magiging doktor si Juan.","In the future, Juan will become a doctor."],
+    ["Noong nakaraang lingo, nagkaroon kami ng mahalagang pagpupulong sa opisina.","Last week, we had an important meeting at the office."]
+  ]
+},
+{
+  id:16, title:"Expressing Thoughts (tila/sa akala/sa palagay) and 'To Go' (pumunta + verb)",
+  v:[
+    ["tila","it seems (adverb, own perception)"],["sa akala / akala","to my thinking / I thought (assumption, may be wrong)"],
+    ["sa palagay / palagay","in my opinion (personal view)"],["isip / umisip / mag-isip / isipin","to think/ponder (active/passive)"],
+    ["pumunta","to go (to a place)"],["paraan","way"],["langoy / lumangoy","to swim / will go swimming"],
+    ["dumalaw","visited"],["pupunta","will go"],["tabing-dagat","beach"],["maysakit","sick"],
+    ["mananalo","will win"],["palagay","opinion"],["maglakad","to walk"]
+  ],
+  g:[
+    "3 ways to say 'I think': (1) tila = adverb 'it seems', placed at sentence start + verb/adjective/pronoun (Tila uulan - It seems it will rain). (2) sa akala/sa palagay = 'to my thinking', a preposition + possessive noun/pronoun (Sa akala ko ikaw ay matalino - I think you are intelligent). (3) isip = real thinking/pondering (umiisip siya ng paraan - he is thinking of a way).",
+    "Sa akala leaves room for the assumption being wrong/corrected; sa palagay expresses a personal opinion/view (like 'sa tingin ko'). Sa/ang before akala and 'ay' can be dropped casually: Akala ko Amerikano siya.",
+    "Pumunta = exact translation of 'to go' to a place, active -um-/mag- verb tenses: Imperative=Pumunta ka dito; Future=Pupunta kami sa simbahan; Past=Pumunta sila sa tabing-dagat; Present=Pumupunta siya sa Maynila araw-araw.",
+    "'To go' + another verb (went swimming, will go to sleep) has NO direct pumunta+verb translation in Tagalog - only the second verb's own tense is used: 'went swimming' = lumangoy (not pumuntang lumangoy); 'will go to sleep' = matutulog."
+  ],
+  s:[
+    ["Tila uulan.","It seems it will rain."],
+    ["Ang sagot niya ay tila mali.","His/her answer seems wrong."],
+    ["Sa akala ko ikaw ay matalino.","I think you are an intelligent man."],
+    ["Sa palagay ko ay mananalo tayo.","I think we will win."],
+    ["Umiisip siya ng lalong mabuting paraan.","He is thinking of a better way."],
+    ["Mag-isip ka ng magagawa.","(You) Think of what can be done."],
+    ["Pumunta ka dito.","Come here."],
+    ["Pupunta kami sa simbahan.","We will go to church."],
+    ["Lalangoy kami.","We will go swimming."],
+    ["Dumalaw kami sa isang kaibigan.","We went to visit a friend."]
+  ]
+},
+{
+  id:17, title:"Relative Pronouns Who/Which/That (ligatures -ng/-g/na linking clauses)",
+  v:[
+    ["nasunog","burned"],["ginigising","being awakened"],["tinanggap","received"],
+    ["niluto","cooked"],["inaabala","being disturbed"],["tinatawag","being called"],
+    ["tanggap / tumanggap","accept/receive"],["bili / bumili","buy"],["abala","disturb"],
+    ["awit/kanta","song/sing"],["mahilig","fond of / hobby"],["mang-aawit","singer"],
+    ["talentado","talented"],["napaka-","very (intensifier prefix)"],["matanda","old (person)"],["luma","old (thing)"]
+  ],
+  g:[
+    "Who/which/that in English become a ligature (-ng, -g, na) connecting a noun/pronoun to a verb (from Lesson 5/7 ligature rules), forming a relative-pronoun-like phrase. Order can flip without changing meaning: ang batang kumakain = ang kumakaing bata (the child who is eating).",
+    "ang bahay na nasunog = ang nasunog na bahay (the house which was burned). ang pagkaing niluto = ang nilutong pagkain (the food that was cooked).",
+    "With a person's proper name as subject, use ligature na (more common) or -ng: Si Pedrong umaawit / Si Pedro na umaawit ay kaibigan ko (Pedro, the one who sings, is my friend).",
+    "'Napaka-' + adjective root expresses 'very [adjective]': napakalaki (very big), napakaganda (very beautiful)."
+  ],
+  s:[
+    ["Ang sulat na tinanggap ko ay kanya.","The letter that I received was his/hers."],
+    ["Maliit ang sapatos na binili ko.","The shoes that I bought were small."],
+    ["Kaming nag-aaral ay inaabala mo.","We who are studying are being disturbed by you."],
+    ["Magaganda ang mga babaeng umaawit.","The women who are singing are beautiful."],
+    ["Ang lalaking natutulog ay ginigising ng bata.","The man who is sleeping is being awakened by the child."],
+    ["Ang mga tinatawag mo ay iyong mga umaalis.","The ones that you are calling are those who are leaving."],
+    ["Si Pedrong umaawit ay kaibigan ko.","Pedro, the one who sings, is my friend."],
+    ["Ang pares ng sapatos na binili ko ay napakalaki.","The pair of shoes that I bought was very large."],
+    ["Ang batang lalaking kumakain ng mga gulay ay malusog.","The boy who eats vegetables is healthy."],
+    ["Ang librong binasa ko ay sulat ni Romulo.","The book which I read was written by Romulo."]
+  ]
+},
+{
+  id:18, title:"Saying Please (paki- / maki- Request Verbs)",
+  v:[
+    ["kunin","get"],["maaari","possible"],["pakikuha","(please) get"],
+    ["pinakikisakay","(please) give a ride"],["pakibasa","(please) read"],["pakidala","(please) bring"],
+    ["balot","package"],["katulong","helper / housemaid"],["nga","truly/indeed (softens request/affirms)"],
+    ["naman","also/too/instead (softens request, adds emphasis)"]
+  ],
+  g:[
+    "paki- + root = passive request verb (like -in- verb), needs doer in possessive form (niya, mo): Pakikuha mo ang aking baro. (Please get my dress.)",
+    "maki- + root = active request verb (like -um- verb), needs doer in nominative form (ako, siya, ikaw): Makikuha ako ng balot sa iyo? / Makitawag ka ng doktor para sa akin (Please call a doctor for me).",
+    "paki- conjugation (kuha->pakikuha): Infinitive/Imperative=pakikuha; Past=pinakikuha; Present=pinakikikuha; Future=pakikikuha.",
+    "maki- conjugation (kuha->makikuha): Infinitive/Imperative=makikuha; Past=nakikuha; Present=nakikikuha; Future=makikikuha.",
+    "Imperative form is used most often for requests. Tagalogs prefer passive speech, so paki- verbs are more common than maki- verbs in requests.",
+    "Nga (truly/indeed) or naman (also/too/instead) added to an imperative softens a request/order even without paki-/maki-: Kunin mo nga ang aking baro. / Kunin mo naman ang aking baro. (Please get my dress.)",
+    "Question-form request: Maaari + ba + ligature -ng + verb: Maaari bang tumawag sa inyo ngayon? (Can/May I call you right now?)"
+  ],
+  s:[
+    ["Pakikuha mo ang aking baro.","(You) Please get my dress."],
+    ["Pakibasa mo sa akin ang kuwento.","(You) Please read to me the story."],
+    ["Pakisulat mo ang iyong pangalan.","(You) Please write your name."],
+    ["Pakidala mo ang aking sulat sa koreo.","(You) Please take my letter to the post office."],
+    ["Makiluto ka ng adobong manok.","(You) Please cook the chicken adobo."],
+    ["Makitawag ka ng doktor para sa akin.","(You) Please call a doctor for me."],
+    ["Pinakitawag ko ang doktor sa kanya.","I requested him/her to call the doctor for me."],
+    ["Makikidala ako ng balutan sa iyo.","I shall request you to carry a package for me."],
+    ["Pakikikuha ko sa katulong ang aking sapatos.","I shall request the housemaid to get the shoes for me."],
+    ["Maaari bang tumawag sa inyo ngayon?","Can/May I call you right now?"]
+  ]
+}
+];
+// Extracted lesson data batch: Lessons 19-23
+const LESSONS_19_23 = [
+{
+  id:19, title:"Personal Pronouns Review (Subject & Possessive Table)",
+  v:[
+    ["ako","I"],["ikaw / ka","you (singular)"],["siya","he/she"],
+    ["kami","we (exclusive, not including listener)"],["tayo","we (inclusive, including listener)"],
+    ["kayo","you (plural/formal)"],["sila","they"],
+    ["ko","my"],["mo","your"],["niya","his/her"],["namin","our (exclusive)"],
+    ["natin","our (inclusive)"],["ninyo","your (plural)"],["nila","their"]
+  ],
+  g:[
+    "Subject pronouns answer 'sino?' (who). Possessive pronouns (short form) answer 'kanino?' (whose).",
+    "Kami = we, not you (exclusive). Tayo = we, including you (inclusive). Namin = our, excludes listener. Natin = our, includes listener.",
+    "Comparison: Kakain kami (we, excl., will eat) vs Kakain tayo (we, incl., will eat); Pagkain namin (our food, excl.) vs Pagkain natin (our food, incl.)."
+  ],
+  s:[
+    ["Ako ay estudyante.","I am a student."],
+    ["Ikaw ay mabait. / Mabait ka.","You are kind."],
+    ["Kami ay pupunta sa mall.","We (not you) will go to the mall."],
+    ["Tayo ay mag-aaral bukas.","We (including you) will study tomorrow."],
+    ["Aklat ko ito.","This is my book."],
+    ["Bahay niya iyon.","That's his/her house."],
+    ["Laruan namin ito.","This is our toy (not yours)."],
+    ["Laro natin ito.","This is our game (including you)."],
+    ["Kakain kami mamaya sa Jollibee.","We (excl.) will eat later at Jollibee."],
+    ["Ito ay bag niya.","That is her bag."]
+  ]
+},
+{
+  id:20, title:"Saan vs Nasaan (Where)",
+  v:[
+    ["saan","where (location of an action)"],["nasaan","where (location of a person/thing)"],
+    ["dito / narito","here (near speaker)"],["diyan / nariyan","there (near listener)"],
+    ["doon / naroon","there (far from both)"],["silid","room"],["silid-aralan","classroom"]
+  ],
+  g:[
+    "Saan asks for the location of an ACTION and is followed by a verb (any tense): Saan pumunta si Peter? Answered with 'sa' + place name, or dito/diyan/doon.",
+    "Nasaan asks for the location of a PERSON or THING, always followed by si/ang(+mga) + noun/pronoun: Nasaan ang bata? Answered with 'nasa' + place name, or narito/nariyan/naroon.",
+    "Do not confuse: Saan pumunta si Peter? (Where did Peter go - action) vs Nasaan si Peter? (Where is Peter - location)."
+  ],
+  s:[
+    ["Saan pumunta si Peter? - Pumunta si Peter sa Baguio.","Where did Peter go? - Peter went to Baguio."],
+    ["Saan tayo kakain? - Dito tayo kakain.","Where shall we eat? - We shall eat here."],
+    ["Saan sila magbabasa? - Doon sila magbabasa.","Where will they read? - They will read there."],
+    ["Nasaan ang bata? - Nasa paaralan ang bata.","Where is the child? - The child is in school."],
+    ["Nasaan ang aking sapatos? - Nasa silid ang iyong sapatos.","Where are my shoes? - Your shoes are in the room."],
+    ["Nasaan si Mary? - Nasa bahay si Mary.","Where is Mary? - Mary is in the house."],
+    ["Nasaan sila? - Nasa paaralan sila.","Where are they? - They are in school."],
+    ["Saan kayo nag-aral ng Tagalog?","Where did you study Tagalog?"]
+  ]
+},
+{
+  id:21, title:"The Preposition Sa (in/to/from/for/on/into/over/through/at)",
+  v:[
+    ["sa","the versatile Tagalog preposition (in/to/from/for/on/into/over/through/at)"],
+    ["silid-aralan","classroom"],["dyip","jeepney (mass transport)"],["salu-salo","party/eating together"],
+    ["palatuntunan","program"],["bintana","window"],["umakyat","climbed/went up"],
+    ["sa loob","inside"],["sa labas","outside"],["sa harap","in front"],["sa tabi","beside"],
+    ["sa itaas","above/up"],["sa gitna","in the middle"],["sa pagitan","between"],
+    ["sa likuran","behind"],["sa ibaba","below/downstairs"],["galing sa / mula sa / buhat sa","from"],
+    ["hanggang","until"]
+  ],
+  g:[
+    "Sa is the single most versatile Tagalog preposition, covering English in/to/from/for/on/into/over/through/at depending on context (this versatility is why Filipinos find English prepositions hard).",
+    "Location words combine with sa: sa loob(inside), sa labas(outside), sa harap(in front), sa tabi(beside), sa itaas(above), sa gitna(middle), sa pagitan(between), sa likuran(behind), sa ibaba(below). 'Sa' becomes 'nasa' when answering a 'nasaan' question about location (nasa loob, nasa likuran).",
+    "'Sa may' = near/about (expresses approximate location).",
+    "To indicate 'from', use galing sa / mula sa / buhat sa (clearer than sa alone) + place name. Mula sa/buhat sa also mean 'a native of/belonging to a place'.",
+    "For time periods: mula/buhat + time (from), hanggang + time (until), mula...hanggang (from...until). Native speakers often omit 'sa' in time phrases but it's still understood without it."
+  ],
+  s:[
+    ["Nag-aaral kami sa silid-aralan.","We are studying in the classroom."],
+    ["Pupunta kami sa Tagaytay bukas.","We shall go to Tagaytay tomorrow."],
+    ["Galing kami sa Baguio.","We came from Baguio."],
+    ["Nagbigay ako ng salu-salo para sa aking kaibigan.","I gave a party for my friend."],
+    ["Ang aklat sa mesa ay bago.","The book on the table is new."],
+    ["Tumalon ang aso sa ilog.","The dog jumped into the river."],
+    ["Aawit siya sa radyo.","She will sing over the radio."],
+    ["Siya ang pangulo namin sa taong ito.","She is our president through this year."],
+    ["Nagsusulat ako sa gabi.","I usually write at night."],
+    ["Siya ay nakatira sa may Roxas Boulevard.","She lives near Roxas Boulevard."],
+    ["Galing sa Baguio ang mga bagong kasal.","The newlyweds came from Baguio."],
+    ["Mula sa Lunes hanggang Biyernes, wala kaming klase.","From Monday to Friday, we will not have classes."]
+  ]
+},
+{
+  id:22, title:"Para Sa & Para Kay (Indirect Objects: for/to)",
+  v:[
+    ["para sa","for (+ possessive pronoun, optionally + ligature -g + noun)"],
+    ["para kay","for (+ proper name of a person)"],["kay","to (+ proper name of a person)"],
+    ["sa (indirect obj.)","to (+ possessive pronoun)"],
+    ["regalo","gift"],["kapatid na babae","sister"],["magbayad","to pay"],["pahayagan","newspaper"],
+    ["para kina","for + plural proper names"],["kina","to + plural proper names"]
+  ],
+  g:[
+    "An indirect object (to/for whom or what) is marked in Tagalog by para kay/para sa/kay/sa. Para kay & para sa both mean 'for'; kay & sa both mean 'to'. NOT interchangeable.",
+    "Formula: para sa / sa + possessive pronoun (+ligature -g + noun, optional). Formula: para kay / kay + proper name of a PERSON.",
+    "A Tagalog sentence with an indirect object need not have a verb: Ito ay regalo ko para sa iyo. = Regalo ko ito para sa iyo. (This is my gift for you.) Word order can flip freely without changing meaning.",
+    "Plural proper names use 'para kina'/'kina' instead of 'para kay'/'kay': Magbayad kayo kina G. at Gng. Smith. In casual speech, 'sa' before kay/kina may be dropped: Magbayad ka kina G. at Gng. Smith."
+  ],
+  s:[
+    ["Bumili siya ng aklat para sa akin.","He/She bought a book for me."],
+    ["Bumili siya ng aklat para sa aking ina.","He/She bought a book for my mother."],
+    ["Sumulat ako ng kuwento para sa mga bata.","I wrote a story for the children."],
+    ["Bumili siya ng aklat para kay Mary.","He/She bought a book for Mary."],
+    ["Magbayad kayo ng utang sa kanya.","Pay your debt to him."],
+    ["Binasa niya ang pahayagan sa kanyang ama.","He/She read the newspaper to his father."],
+    ["Sumulat siya kay Bob kahapon.","He wrote to Bob yesterday."],
+    ["Ito ay regalo ko para sa iyo.","This is my gift for you."],
+    ["Ito ay regalo ko kay Helen.","This is my gift to Helen."],
+    ["Magbayad kayo kina G. at Gng. Smith.","You pay Mr. and Mrs. Smith."]
+  ]
+},
+{
+  id:23, title:"Telling Time (ika- + number, oras)",
+  v:[
+    ["umaga","morning"],["tanghali","noon (11am-1pm)"],["hapon","afternoon"],["gabi","night"],
+    ["hatinggabi","midnight"],["madaling-araw","dawn"],["oras","hour"],["minuto","minute"],
+    ["kalahati","half"],["beses / ilang beses","frequency / few times"],["hanggang","until"],
+    ["sandali","second/moment; 'for a while' as a response"],["anong oras na?","what time is it?"],
+    ["ngayon","now"],["kanina","a moment ago"],["kahapon","yesterday"],["kagabi","last night"],
+    ["kamakalawa","day before yesterday"],["bukas","tomorrow"],["samakalawa","day after tomorrow"],
+    ["mamaya","later within the day"]
+  ],
+  g:[
+    "To express clock time, prefix ika- to a cardinal number: ika-apat ng hapon = four p.m. Exception: 1:00 = 'unang oras' not ika-isa.",
+    "Full time-of-day words: umaga(morning ~1-11am), tanghali(noon 11am-1pm), hapon(afternoon), gabi(evening/night), hatinggabi(midnight).",
+    "Time relative words - Present: ngayon(now), ngayong araw(today). Past: kanina(a moment ago), kahapon(yesterday), kagabi(last night), kamakalawa(day before yesterday), noong+[day/week/month/year](last...). Future: mamaya(later today), bukas(tomorrow, exception - no 'sa' needed), samakalawa(day after tomorrow), sa+[day/week/month/year](next...).",
+    "Abbreviations: n.u.=ng umaga(am), n.t.=ng tanghali(noon), n.h.=ng hapon(pm afternoon), n.g.=ng gabi(pm evening).",
+    "Kailan (when) questions are answered with time phrases combining ngayon/noong/kanina+ng/sa/sa isang+ng."
+  ],
+  s:[
+    ["Anong oras na?","What time is it?"],
+    ["Ngayon ay ika-apat ng hapon.","It is four p.m."],
+    ["Anong araw at oras ka ba aalis?","What day and time are you leaving?"],
+    ["Aalis ka ba mamaya?","Will you leave later (within the day)?"],
+    ["Oo, mamayang ikalima ng hapon.","Yes, later at five in the afternoon."],
+    ["Pupunta kami sa kapilya bukas sa ikapito ng umaga.","We will go to the chapel tomorrow at seven in the morning."],
+    ["Dadalaw kami sa aming kaibigan sa ikalima ng hapon.","We shall visit our friend at five in the afternoon."],
+    ["Sa isang linggo, kami ay pupunta sa Tagaytay.","Next week, we shall go to Tagaytay."],
+    ["Noong isang buwan, pumunta kami sa Baguio.","Last month, we went to Baguio."],
+    ["Ilang oras ang inyong pag-aaral sa Tagalog?","How many hours do you study Tagalog?"]
+  ]
+}
+];
+// Extracted lesson data batch: Lessons 24, 24-1 (Conjunctions), 25, 26
+const LESSONS_24_26 = [
+{
+  id:24, title:"The Word 'When' (kailan/nang-noon/kung-kapag)",
+  v:[
+    ["kailan","when (question word)"],["nang / noon","when (indefinite past action)"],
+    ["kung / kapag (pag)","when/if (present or future action)"],
+    ["kung sino","as to who"],["kung ano","as to what"],["kung saan","as to where"],
+    ["kung alin","as to which"],["kung kailan","as to when"],["kung paano","as to how"],
+    ["kung kanino","as to whom"],["hindi ko alam / ewan ko / di ko alam","I don't know"],
+    ["naghihilik","snores"],["magtatampo","will be displeased"],["babalik","will return"]
+  ],
+  g:[
+    "English 'when' has 3 Tagalog translations depending on context: (1) kailan = question word (Kailan ka aalis? - When will you leave?). (2) nang or noong(+ligature -g) = indefinite PAST action (Noong ako'y maliit, ako'y may aso - When I was small, I had a dog). (3) kung or kapag(shortened: pag) = PRESENT or FUTURE action, similar meaning to 'if' (Kung aalis ka, sasama ako sa iyo - When/If you leave, I shall go with you).",
+    "Kung + question word = 'as to ___' phrases: kung sino(as to who), kung ano(as to what), kung saan(as to where), kung alin(as to which), kung kailan(as to when), kung paano(as to how), kung kanino(as to whom). 'Kung' may be dropped in casual conversation.",
+    "Ex: Ewan ko kung sino siya (I do not know who he/she is - as to who). Alam mo ba kung kailan siya babalik? (Do you know when he will return?)."
+  ],
+  s:[
+    ["Kailan ka aalis?","When will you leave?"],
+    ["Kailan ka dumating?","When did you arrive?"],
+    ["Noong ako'y maliit, ako'y may aso.","When I was small, I had a dog."],
+    ["Nakita ko siya nang ako ay nasa Estados Unidos.","I saw him when I was in the United States."],
+    ["Kung aalis ka, sasama ako sa iyo.","When/If you leave, I shall go with you."],
+    ["Naghihilik siya kapag natutulog.","He snores when he is sleeping."],
+    ["Magtatampo ako pag aalis ka.","I will be displeased if you leave."],
+    ["Ewan ko kung sino siya.","I do not know who he/she is."],
+    ["Sabihin mo kung ano ang iyong gusto.","Say what you like."],
+    ["Alam mo ba kung kailan siya babalik?","Do you know when he will return?"],
+    ["Hindi ko alam kung paano magsayaw ng Tinikling.","I do not know how to dance the Tinikling."],
+    ["Kami ay magkaibigan noong bata kami.","We were friends when we were young."]
+  ]
+},
+{
+  id:241, title:"Conjunctions (at/o/pero/kasi/dahil/kaya/kung/kapag/kahit/tsaka/bago/pagkatapos)",
+  v:[
+    ["at","and"],["o","or"],["pero","but"],["ngunit (formal)","however"],["subalit (formal)","however"],
+    ["kasi","because (casual)"],["dahil","because"],["kaya","so / therefore"],
+    ["para","so that / in order to"],["pati","including / as well as"],["habang","while"],
+    ["samantalang","while / whereas"],["kapag","when (conditional)"],["kung","if"],
+    ["kahit","although / even though"],["tsaka / saka","and then / also"],
+    ["bago","before"],["pagkatapos","after"]
+  ],
+  g:[
+    "Common conjunctions connecting clauses. Distinguish kasi(casual 'because', explains a reason conversationally) vs dahil(neutral 'because') vs ngunit/subalit(formal 'however', more formal than pero).",
+    "Kaya = so/therefore (result). Para = so that/in order to (purpose). Pati = including/as well as.",
+    "Habang/samantalang = while (simultaneous actions); kapag = when (conditional, repeatable condition); kung = if (conditional); kahit = although/even though (concession).",
+    "Tsaka/saka = and then (sequence); bago = before; pagkatapos = after."
+  ],
+  s:[
+    ["Kumain ako at natulog.","I ate and slept."],
+    ["Tubig o juice?","Water or juice?"],
+    ["Gusto ko pero busy ako.","I want to, but I'm busy."],
+    ["Late ako kasi trapik.","I'm late because there's traffic."],
+    ["Masaya siya dahil holiday.","She is happy because it's a holiday."],
+    ["Umulan, kaya basa ako.","It rained, so I'm wet."],
+    ["Kung libre ka, chat mo ako.","If you're free, message me."],
+    ["Kapag pagod ako, natutulog ako.","When I'm tired, I sleep."],
+    ["Kahit mahirap, kakayanin ko.","Even though it's hard, I will manage."],
+    ["Kakain ako, tsaka aalis.","I will eat, and then leave."],
+    ["Bago matulog, ako ay nagsisipilyo muna.","Before sleeping, I brush my teeth first."],
+    ["Pagkatapos kumain, ako ay nagsisipilyo.","After eating, I brush my teeth."]
+  ]
+},
+{
+  id:25, title:"Verb Roots (aral/sabi/alam/kilala/dala/tanong/sagot/laki/ibig/galing/ayaw/lakad)",
+  v:[
+    ["aral -> mag-aral","to study, to learn"],
+    ["sabi -> sabihin","to say"],
+    ["alam -> malaman","to know (things)"],
+    ["kilala -> makilala","to know (persons)"],
+    ["dala -> dalhin","to bring or carry"],
+    ["tanong -> tanungin","to ask"],
+    ["sagot -> sagutin","to answer"],
+    ["laki -> lumaki","to grow"],
+    ["ibig -> ibigin","to love or like"],
+    ["galing -> manggaling","to come from"],
+    ["ayaw -> umayaw / ayawan","to decline/dislike / to be declined/disliked"],
+    ["lakad -> lumakad","to walk"],
+    ["tanong (noun)","question"],["mabagal","slow"],["mas matimbang","has more weight"],["mahirap sagutin","difficult to answer"]
+  ],
+  g:[
+    "A verb root is the basic uninflected form (e.g. aral). Adding an affix creates tenses (nag-aral=past, mag-aaral=future) or turns it into an adjective (aral na tao=educated person, kilalang guro=well-known teacher).",
+    "When a verb root is preceded by the article ang/ang mga (or ng/sa), it becomes a NOUN meaning 'the one who/the thing that/what is': Ang aral niya ay mabagal (His/her study is slow). Ang sagot ko ay tama (My answer is right). Ang alam ko lamang ay ang pangalan niya (All I know is his name).",
+    "This noun-forming pattern connects directly to Lesson 26 (Forming Nouns)."
+  ],
+  s:[
+    ["Ang aral niya ay mabagal.","His/Her study is slow."],
+    ["Ang sagot ko ay tama.","My answer is right."],
+    ["Ang sabi niya ang mas matimbang sa sinabi mo.","His/Her statement has more weight than yours."],
+    ["Ang alam ko lamang ay ang pangalan niya.","All I know is his name."],
+    ["Ang kilala ko ay ang kanyang ama.","I know his father."],
+    ["Ang dala ni Peter ay bola ng kanyang kuya.","Peter is carrying his brother's ball."],
+    ["Ang tanong ng bata ay mahirap sagutin.","The question of the child is difficult to answer."],
+    ["Ang laki ng bahay ko ay katamtaman lamang.","The size of my house is average only."],
+    ["Ibig ng lalaki na makuha ang pagmamahal ng babae.","The desire of the man is to get the love of the woman."],
+    ["Ang ayaw ng guro ay tamad na estudyante.","What is disliked by the teacher is a lazy student."]
+  ]
+},
+{
+  id:26, title:"Forming Nouns from Verbs/Adjectives (ang/ng/sa + verb)",
+  v:[
+    ["pangulo","president"],["sipag","diligence/hard work"],["igalang","to respect"],
+    ["naaawa","to pity"],["nagagalit","is angry"],["masipag","hardworking"]
+  ],
+  g:[
+    "A verb or adjective becomes a NOUN simply by placing ang/ng/sa (or plural ang mga/ng mga/sa mga) before it. The verb may be in any tense (past/present/future). The resulting noun means: 'the one who', 'the thing that', 'the one which', or 'what is'.",
+    "The person/thing referred to may be stated or implied: Ang kumain ng mangga ay si Jose (The one who ate the mango is Jose) vs the more redundant Ang batang kumain ng mangga ay si Jose (The child who ate the mango is Jose) - the first is preferred for brevity.",
+    "Examples: Ang nagsasalita ay ang pangulo (The one who is speaking is the president). Ang natutulog ay parang anghel (The one sleeping is like an angel)."
+  ],
+  s:[
+    ["Binabasa mo ba ang sinulat ko?","Are you reading what was written by me?"],
+    ["Ang nagsasalita ay ang pangulo.","The one who is speaking is the president."],
+    ["Ang natutulog ay parang anghel.","The one sleeping is like an angel."],
+    ["Ang dumating ay aking tatay.","The one who arrived was my father."],
+    ["Ito ay para sa mahihirap.","This will be for the poor."],
+    ["Ang mahal niya ay isang matalinong lalaki.","The one she loves is an intelligent man."],
+    ["Ibibigay ko ito sa taong aalis.","I shall give this to the one who is leaving."],
+    ["Ang basa niya ay tungkol kay Rizal.","The one which he read was about Rizal."],
+    ["Ang mahal ay hindi dapat bilhin.","The expensive one should not be bought."],
+    ["Ang mga mataba ay masaya.","The fat are happy."]
+  ]
+}
+];
+// Extracted lesson data batch: Lessons 27 (I-Verbs), 28 (Adverbs), 29 (Conjunctions & Interjections)
+const LESSONS_27_29 = [
+{
+  id:27, title:"I- Verb Forms (Benefactive: doing something FOR someone)",
+  v:[
+    ["ihanap (ng)","to have someone look for something"],
+    ["ihulog (ang)","to let something fall / to mail/post"],
+    ["idagdag (ang)","to add"],["ihiram (ng)","to borrow for someone else"],
+    ["ilagay (ang)","to place in or on"],["isulat (ng)","to write for another"],
+    ["ibili (ng)","to have someone buy something"],["ibasa (ng)","to read for another"],
+    ["iluto (ang)","to cook (for another)"],["ituro (ang)","to teach"],
+    ["itapon (ang)","to throw away"],["ibigay (ang)","to give something to someone"],
+    ["iwala (ang)","to lose"],["ibalita (ang)","to give information"],
+    ["ilagay (ang)","to place"],["ibilad (ang)","to place under the sun"],
+    ["isama","to take/bring someone along"]
+  ],
+  g:[
+    "Prefix i- makes a passive verb meaning 'to do something FOR another person' (isulat mo ako = write for me) while also performing the base action (ihulog ang sulat = post the mail for someone).",
+    "i- verb used only when the active -um-/mag- verb has a direct object. Test: isolate verb, ask 'sino/ano' after it to find the object.",
+    "Consonant-initial roots: prefix i- (or variant ipag- for mag- verbs) attaches to all tenses; infix -in- attaches to past/present. sulat->isulat(inf)->isinulat(past)->isinusulat(pres)->isusulat(fut).",
+    "mag- verb variant ipag-: sulat->ipagsulat(inf)->ipinagsulat(past)->ipinagsusulat(pres)->ipagsusulat(fut).",
+    "Vowel-initial roots (and roots starting h/l/y/w): prefix i- attaches to all tenses; infix -in- becomes -ni- for past/present. hanap->ihanap(inf)->inihanap(past)->inihahanap(pres)->ihahanap(fut). luto->iluto(inf)->inilulto(past)->inilulto(pres)->iluluto(fut).",
+    "Sentence patterns: (1) active -um- verb's indirect object (marked sa/para sa/kay/para kay) becomes subject: Bumili ng isda ang babae para sa kanyang ina -> Ibinili ng babae ng isda ang kanyang ina. (2) active mag- verb's direct object becomes subject: Naglinis ng bahay siya -> Inilinis niya ang bahay.",
+    "Common learner errors: many i- verbs have NO alternate infixed forms like 'binalita/tinapon' - the correct forms are always ibinalita, itinapon etc. (i- prefix retained in all tenses)."
+  ],
+  s:[
+    ["Ihahanap ko siya ng bagong aklat.","I shall look for a new book for him/her."],
+    ["Ilulto mo ang isda ngayong gabi.","You cook the fish tonight."],
+    ["Ibigay mo sa akin ang pahayagan.","Give me the newspaper."],
+    ["Iniwala ni Peter ang aking bola.","Peter lost my ball."],
+    ["Ihuhulog ko ang sulat sa koreo.","I will drop the letter at the Post Office."],
+    ["Itinuturo niya sa amin ang wikang Tagalog.","He/She is teaching us the Tagalog language."],
+    ["Ibinili ako ng bagong baro ng aking ina.","My mother bought a new dress for me."],
+    ["Maganda ang aking pakikisama sa mga Pilipinong guro.","I have a good relationship with Filipino teachers."],
+    ["Itinapon niya ang lumang tinapay.","He threw away the stale bread."],
+    ["Ibinigay niya ang magandang bulaklak.","He gave a pretty flower."]
+  ]
+},
+{
+  id:28, title:"Adverbs (Manner, Place, Time, Quantity)",
+  v:[
+    ["paupo","sitting down"],["patayo","standing"],["pahiga","lying down"],
+    ["ganito","like this (near speaker)"],["ganyan","like that (near listener)"],["ganoon","like that (far from both)"],
+    ["mabilis","fast"],["dahan-dahan","slowly / softly"],["bigla / agad","suddenly / at once"],
+    ["dito","here"],["diyan","there (near listener)"],["doon","there (far)"],
+    ["saanman","wherever"],["sa loob","inside"],["sa labas","outside"],
+    ["buhat / mula","from"],["na","already"],["pa","yet / more"],["sandali","for a while"],
+    ["pagkatapos","after"],["bago","before"],["pirmi / parati / lagi","always"],
+    ["tuwi","every (+ligature -ng+date)"],["saka na","later"],["kung minsan","sometimes"],
+    ["bihira","seldom"],["samantala / habang","meanwhile / while"],["habang-panahon","forever"],
+    ["marami","many, much"],["konti / kaunti","little"],["wala","none, nothing"]
+  ],
+  g:[
+    "Adverbs modify actions by describing how, where, or when something happens. Adverbs of manner are typically formed with 'nang' + pa- prefixed verb root: paupo(sitting), patayo(standing), pahiga(lying down). 'Nang' introduces the adverb: Ang bata ay nagbasa nang paupo (The child read sitting down).",
+    "Adverb can also be placed before the verb with a ligature instead of 'nang': Dahan-dahan siyang lumakad (same meaning as Lumakad siya nang dahan-dahan) - She walks slowly. Word order flips freely: verb+nang+adverb = verb+ligature+adverb = adverb+ligature+verb.",
+    "When adverb of manner precedes a verb AND the subject is a person's proper name, use ligature 'na' after the name: Dahan-dahan si Dulce na lumakad.",
+    "Adverbs of place: dito(here)/diyan(there,near listener)/doon(there,far). Saanman=wherever. Sa loob(inside)/sa labas(outside). Buhat/mula sa...hanggang sa = from...to.",
+    "Adverbs of time: na(already), pa(yet/more), nang/noong(when - also means 'last' with a date, e.g. noong Lunes=last Monday), sandali(for a while), pagkatapos(after, +infinitive verb), bago(before, +infinitive verb), pirmi/parati/lagi(always), tuwi(+ligature-ng+date = every), saka na(later), buhat noon...hanggang(from...until/since), kung minsan(sometimes, w/ present tense), bihira(seldom), samantala/habang(meanwhile/while, w/ present tense), habang-panahon(forever), sa tanang buhay ko(in my whole life), sa ibang araw(some other day).",
+    "Adverbs of quantity: marami(many/much), konti/kaunti(little), wala(none/nothing)."
+  ],
+  s:[
+    ["Ang bata ay nagbasa nang paupo.","The child read sitting down."],
+    ["Ganito siya kung lumakad.","She walks like this."],
+    ["Si Peter ay kumakain nang mabilis.","Peter is eating fast."],
+    ["Lumalakad siya nang dahan-dahan.","She walks slowly."],
+    ["Siya ay tumayo nang bigla.","He/She stood up suddenly."],
+    ["Naglalaro ang aking kapatid na lalaki dito.","My brother plays here."],
+    ["Saanman siya pumunta, sasama ako.","Wherever she goes, I shall go with her."],
+    ["Kami ay lumakad buhat sa baryo hanggang sa lungsod.","We walked from the barrio to the city."],
+    ["Siya ay umalis na.","He/She left already."],
+    ["Hindi pa ako kumakain.","I have not eaten yet."],
+    ["Natapos niya ang kolehiyo noong Marso.","He/She finished college last March."],
+    ["Tuwing Lunes, siya ay tinatamad.","Every Monday, she feels lazy."],
+    ["Mараming kinain si Tom.","Tom eats much."],
+    ["Wala akong gusto.","I like nothing."]
+  ]
+},
+{
+  id:29, title:"More Conjunctions & Interjections (expressing emotion)",
+  v:[
+    ["at (->'t after vowel)","and"],["o","or"],["pero / nguni't / subali't","but"],
+    ["kung / pag","if"],["samantala / habang","meanwhile / while"],
+    ["nang","in order that / so that"],["kung hindi (kundi)","except / but"],
+    ["dahil sa","because of"],["sapagka't / mangyari","because (answers 'bakit')"],
+    ["samakatuwid / samakatwid","therefore"],["kung ano...siya rin","as...so is... (like...like...)"],
+    ["at sa wakas","finally, at last"],
+    ["Ay!","interjection - despair"],["Aba!","interjection - surprise"],["Aray!","interjection - pain"],
+    ["Naku!","interjection - surprise / disbelief"],["Sayang!","interjection - pity"],
+    ["Mabuhay!","interjection - welcome / long live"],["Susmaryosep! / Sus!","interjection - exclamation (Jesus, Maria, Jose)"]
+  ],
+  g:[
+    "Conjunctions join clauses/phrases/words and show a relationship between them (one thought less/as important as the other). 'At'(and) can shorten to 't after a vowel-ending word.",
+    "Pero/nguni't/subali't = but (nguni't/subali't more formal, avoid in casual conversation). Kung/pag = if (interchangeable). Samantala/habang = meanwhile/while, used with present tense verbs.",
+    "Nang (different from the time-word nang) = 'in order that/so that': Huwag kang maingay nang ako'y makatulog (Don't be noisy so I can sleep).",
+    "Kung hindi shortens to kundi = 'except/but' (literally 'if not'): Walang naparito kundi si Mary (Nobody came except Mary).",
+    "Dahil sa = because of. Sapagka't/mangyari = because (used specifically to answer a 'bakit' why-question).",
+    "Samakatuwid/samakatwid = therefore. 'Kung ano...siya rin' pattern = as...so is... (Kung ano ang ama ay siya ring anak = Like father, like son). 'At sa wakas' = finally, at last.",
+    "Interjections express emotion and stand alone or attach to a sentence; common in speech, not formal writing: Ay!(despair), Aba!(surprise), Aray!(pain), Naku!(surprise/disbelief, short for Inay ko po! 'Oh my mother!'), Sayang!(pity), Mabuhay!(welcome/long live), Susmaryosep!/Sus!(exclamation from Jesus-Maria-Jose, reflecting Spanish Catholic heritage)."
+  ],
+  s:[
+    ["Nagsusulat siya, gabi at araw.","He writes night and day."],
+    ["Ako ba o siya ang ibig mo?","Do you like me or him/her?"],
+    ["Ibig kong umalis pero umuulan.","I like to leave but it is raining."],
+    ["Kung umulan, hindi ako lalakad.","If it rains, I shall not go."],
+    ["Samantalang natutulog ang sanggol, ako'y maglalaba.","While the baby sleeps, I shall do the laundry."],
+    ["Huwag kang maingay nang ako'y makatulog.","Do not be noisy so I can sleep."],
+    ["Walang naparito kundi si Mary.","Nobody came except Mary."],
+    ["Dahil sa iyo, ako ay dadalo sa pagdiriwang.","Because of you, I shall attend the celebration."],
+    ["Bakit ka ba malungkot? - Sapagka't ako'y may sakit.","Why are you sad? - Because I am sick."],
+    ["Hindi ka mabait, samakatuwid, ayoko sa'yo.","You are not nice, therefore, I do not like you."],
+    ["Kung ano ang ama ay siya ring anak.","Like father, like son."],
+    ["At sa wakas, pagpalain kayo ng Diyos.","Finally, may God bless you."],
+    ["Naku! Ang ganda ng bahay mo!","Wow! Your house is beautiful!"],
+    ["Sayang! Nawala ang pera ko.","What a pity! My money was lost."],
+    ["Aray! Masakit ang ulo ko.","Ouch! My head is aching!"]
+  ]
+}
+];
+// Extracted lesson data batch: Lessons 30 (Magpa-/Pa-in Verbs), 31 (Disagreement/Agreement/Doubt)
+const LESSONS_30_31 = [
+{
+  id:30, title:"Magpa- and Pa-+In Verb Forms (Causative: ordering something done)",
+  v:[
+    ["magpakain","to feed someone / to have someone fed"],
+    ["magpabasa","to order someone to read"],["magpalinis","to have someone clean"],
+    ["magpagamot","to have someone treated/cured"],["magpaalis","to have someone leave"],
+    ["magpakuha","to have someone get something"],["magpasulat","to have someone write"],
+    ["magpaayos","to have someone fix/arrange"],["magpagupit","to have a haircut"],
+    ["magpagaling","to get well / recover"],["buhok","hair"],["mahihirap na tao","poor people"]
+  ],
+  g:[
+    "Magpa- (active) and pa-+in/pa-+hin (passive) express an ORDER/CAUSATION - having someone else do something (distinct from i- verbs which do something FOR someone). Ex: magpapakain sa mga bisita = will feed (food to) visitors (causing food to be given); pinakain ang mga bisita = visitors were fed.",
+    "Consonant-ending roots, active magpa- (kain->magpakain): Inf/Imp=magpakain; Past=nagpakain; Present=nagpapakain; Future=magpapakain; Verbal Noun=pagpapakain.",
+    "Consonant-ending roots, passive pa-+in (kain->pakainin): Inf/Imp=pakainin; Past=pinakain(infix -in- between 1st/2nd letter of pa-); Present=pinapakain; Future=pakakainin; Verbal Noun=pagpapakain.",
+    "Vowel-ending roots use suffix -hin for the passive form instead of -in: basa->pabasahin (Inf/Imp), pinabasa(past), pinababasa(pres), pababasahin(fut).",
+    "Active vs passive emphasis differs though translation is similar: Nagpakain kami ng mahihirap na tao (We fed the poor - emphasizes subject 'we') vs Pinakain namin ang mahihirap na tao (The poor were fed by us - emphasizes the receiver).",
+    "Common idiom: Magpagaling po kayo! = Get well soon!"
+  ],
+  s:[
+    ["Uso ang magpakain sa Pilipinas tuwing may pagdiriwang.","Feeding people is common in the Philippines during celebrations."],
+    ["Ang pagpapakain niya sa mga mahihirap ay napakabuting gawain.","Feeding the poor is a good deed."],
+    ["Magpapabasa ako sa doktor ng aking resulta sa laboratoryo.","I shall have the doctor read my lab results."],
+    ["Pabasahin mo sa doktor.","Have the doctor read it."],
+    ["Nagpapabasa silá sa mga paaralán ng mga aklát ni Rizal.","They order the books of Rizal read in schools."],
+    ["Pinabábasa sa mga paaralán ang mga aklát ni Rizal.","The books of Rizal are ordered read in schools."],
+    ["Nagpakáin kamí ng mahihírap na táo.","We fed the poor."],
+    ["Pinakáin namín ang mahihírap na táo.","The poor people were fed by us."],
+    ["Nagpagupít siyá ng buhók.","He/She had a haircut."],
+    ["Pinagupít niyá ang kanyáng buhók.","He/She had a haircut."],
+    ["Magpagaling po kayo!","Get well soon!"]
+  ]
+},
+{
+  id:31, title:"Expressing Disagreement, Agreement, Doubt",
+  v:[
+    ["hindi / 'di","no (most common negative)"],["huwag","don't / do not / stop"],
+    ["ayaw","to dislike / not want"],["oo","yes"],["opo / oho","yes, sir/ma'am (polite)"],
+    ["siyanga","that is right, that is true (confirm/agree)"],
+    ["totoo","true, indeed, truly"],["talaga","yes, indeed; really (emphasis)"],
+    ["marahil","maybe"],["tila","it seems"],["siguro","maybe / definitely (depends on context)"],
+    ["baka","might be"],["maaari","it can be / possible"],["walang naparito","no one came"]
+  ],
+  g:[
+    "Hindi ('di) = most common 'no'. But questions with 'may/mayroon' (Do you have...?) are answered negatively with 'wala' not 'hindi'. Hindi pairs with pa/na for emphasis (Hindi pa, Hindi na).",
+    "To negate a word: place hindi before it, OR use shortened prefix di-/dî before it (hyphenated): Ang bata ay hindi mabait. = Ang bata ay dî mabait. = Ang bata ay di-mabait. (The child is not good.)",
+    "Huwag = Don't!/Stop! With ACTIVE verbs (-um-/mag-/ma-/magpa-) needs personal pronoun (ka/kayo/tayo): Huwag kang umalis (Don't leave). With PASSIVE verbs (-in/i-/-an) needs possessive pronoun (mo/natin): Huwag mong kanin iyan (Don't eat that). Huwag also pairs with infinitive or future tense for commands/requests.",
+    "Ayaw = dislike/don't want, opposite of gusto/ibig. Active form needs personal pronoun (Ayaw siyang magsalita); passive form needs possessive pronoun (Ayaw niyang magsalita) - same meaning either way.",
+    "Agreement words: Oo=yes (opo/oho=polite yes to elders/authority, reserve plain oo for peers). Siyangâ='that is right/true' (confirms agreement - careful not to confuse with siyá=he/she). Totoó='true/indeed', a one-word confirmation, can substitute for oo. Talagá='yes indeed/really', emphasizes the truth of an adjective/statement, placed at sentence start or near the adjective (also used sarcastically as 'Really?' with raised eyebrows to show disbelief).",
+    "Doubt words: Marahil='maybe' (stands alone or placed near the subject/at sentence end). Tila='it seems' (speaker's own view, sentence-initial). Siguro='maybe or definitely' depending on context/response pattern (Siguro ako=I am sure; Hindi ako siguro=I'm not sure; Siguro=Maybe). Baka='might be' - the shortest, most common, casual doubt word (careful: baka with a glottal stop = might-be, without = cow/beef). Maaari='can be/possible', gives a blanket of doubt like hindi gives negation (Maaaring totoo=could be true; Maaaring mali=could be wrong); alone, maaari also means 'It is possible' and is used in polite requests."
+  ],
+  s:[
+    ["Hindi tayo aalis.","No, we are not leaving."],
+    ["Ang bata ay hindi mabait. / Ang bata ay di-mabait.","The child is not good."],
+    ["Huwag kang umalis.","Don't leave."],
+    ["Huwag mong kanin iyan.","Don't eat that."],
+    ["Huwag kayong makikain nang madalas.","Don't eat often (request)."],
+    ["Ayaw kong kumain.","I don't like to eat."],
+    ["Ayaw ba kayong magpasyal?","Don't you like to take a walk?"],
+    ["Siyanga, mabait siya.","That's right, he/she is good."],
+    ["Totoó, hindî na siyá babalík.","Truly, he/she is not coming back anymore."],
+    ["Talagáng mabuting táo si G. Santos.","Mr. Santos is a really good man."],
+    ["Marahil siya ay darating bukas.","Maybe he is arriving tomorrow."],
+    ["Tila uulan ngayon.","It seems it will rain today."],
+    ["Hindi ako sigurado.","I am not sure."],
+    ["Baka ka magkasakit.","You might get sick."],
+    ["Maaaring totoo na siya ay mag-aasawa na.","It could be true that he/she is getting married."],
+    ["Siguro kami ang magkasama sa eskwelahan ngayon.","Maybe we are the pair in school now."],
+    ["Baka makilaro ako sa inyo.","I might play with you."]
+  ]
+}
+];
+const ALL_LESSONS = [].concat(LESSONS_1_5, LESSONS_6_10, LESSONS_11_13, LESSONS_14_18, LESSONS_19_23, LESSONS_24_26, LESSONS_27_29, LESSONS_30_31);
+
+/* ================= Derived decks ================= */
+const LESSON_ORDER = ALL_LESSONS.map(function(l){ return l.id; });
+const VOCAB_CARDS = [];
+const SENT_CARDS = [];
+ALL_LESSONS.forEach(function(lesson){
+  (lesson.v||[]).forEach(function(pair, idx){
+    VOCAB_CARDS.push({ id:'v'+lesson.id+'_'+idx, lessonId:lesson.id, tl:pair[0], en:pair[1] });
+  });
+  (lesson.s||[]).forEach(function(pair, idx){
+    SENT_CARDS.push({ id:'s'+lesson.id+'_'+idx, lessonId:lesson.id, tl:pair[0], en:pair[1] });
+  });
+});
+const TOTAL_DAYS = 60;
+const NEW_CAP = { vocab: 18, sent: 8 };
+const SESSION_CAP = { vocab: 30, sent: 12 };
+const QUIZ_LEN = 10;
+
+function lessonById(id){ return ALL_LESSONS.filter(function(l){ return l.id===id; })[0]; }
+function lessonIdx(id){ return LESSON_ORDER.indexOf(id); }
+function unlockDay(id){ return Math.floor(lessonIdx(id)*1.5)+1; }
+function isUnlocked(id, day){ return unlockDay(id) <= day; }
+
+/* ================= Date / utils ================= */
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+function toDateStr(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function todayStr(){ return toDateStr(new Date()); }
+function addDays(str, n){ const d=new Date(str+'T00:00:00'); d.setDate(d.getDate()+n); return toDateStr(d); }
+function currentDay(){
+  const start = new Date(state.startDate+'T00:00:00');
+  const now = new Date(todayStr()+'T00:00:00');
+  const diff = Math.round((now-start)/86400000);
+  return Math.min(TOTAL_DAYS+30, Math.max(1, diff+1));
+}
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function sampleN(arr, n){ return shuffle(arr).slice(0, n); }
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* ================= State ================= */
+const STORAGE_KEY = 'tglChallenge_v1';
+let state = null;
+function loadState(){
+  let raw = null;
+  try{ raw = localStorage.getItem(STORAGE_KEY); }catch(e){}
+  if(raw){
+    try{ state = JSON.parse(raw); }catch(e){ state = null; }
+  }
+  if(!state){
+    state = {
+      startDate: todayStr(),
+      cardState: {},
+      newIntroducedByDate: { vocab:{}, sent:{} },
+      streak: { last:null, count:0 },
+      stats: { totalReviews:0 },
+      firstRun: true
+    };
+    saveState();
+  }
+  if(!state.newIntroducedByDate) state.newIntroducedByDate = { vocab:{}, sent:{} };
+  if(!state.stats) state.stats = { totalReviews:0 };
+  if(!state.streak) state.streak = { last:null, count:0 };
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+
+function countIntroducedToday(pool){
+  const d = state.newIntroducedByDate[pool] || {};
+  return d[todayStr()] || 0;
+}
+function bumpNewCount(pool){
+  const d = state.newIntroducedByDate[pool] = state.newIntroducedByDate[pool] || {};
+  d[todayStr()] = (d[todayStr()]||0) + 1;
+}
+function touchStreak(){
+  const t = todayStr();
+  if(state.streak.last === t) return;
+  const y = addDays(t, -1);
+  if(state.streak.last === y){ state.streak.count += 1; }
+  else { state.streak.count = 1; }
+  state.streak.last = t;
+  saveState();
+}
+
+/* ================= SRS ================= */
+function gradeCard(cardId, grade){
+  const st = state.cardState[cardId];
+  if(!st) return;
+  if(grade==='again'){
+    st.reps = 0; st.interval = 0; st.ef = Math.max(1.3, (st.ef||2.5)-0.2); st.due = todayStr();
+  } else if(grade==='good'){
+    st.reps = (st.reps||0) + 1;
+    st.interval = st.reps===1 ? 1 : st.reps===2 ? 3 : Math.round((st.interval||1)*(st.ef||2.5));
+    st.due = addDays(todayStr(), st.interval);
+  } else {
+    st.ef = (st.ef||2.5) + 0.15;
+    st.reps = (st.reps||0) + 1;
+    st.interval = st.reps===1 ? 3 : st.reps===2 ? 6 : Math.round((st.interval||1)*st.ef*1.3);
+    st.due = addDays(todayStr(), st.interval);
+  }
+  st.lastReview = todayStr();
+  state.stats.totalReviews = (state.stats.totalReviews||0) + 1;
+  touchStreak();
+  saveState();
+}
+
+function buildSessionQueue(poolCards, poolName, newCap, sessionCap){
+  const day = currentDay();
+  const unlockedIds = {};
+  LESSON_ORDER.forEach(function(id){ if(isUnlocked(id, day)) unlockedIds[id]=true; });
+  const available = poolCards.filter(function(c){ return unlockedIds[c.lessonId]; });
+  const today = todayStr();
+  const due = [], fresh = [];
+  available.forEach(function(c){
+    const st = state.cardState[c.id];
+    if(st){ if(st.due <= today) due.push(c); }
+    else { fresh.push(c); }
+  });
+  due.sort(function(a,b){ return state.cardState[a.id].due.localeCompare(state.cardState[b.id].due); });
+  const already = countIntroducedToday(poolName);
+  const allowance = Math.max(0, newCap - already);
+  const freshToUse = fresh.slice(0, allowance);
+  freshToUse.forEach(function(c){
+    state.cardState[c.id] = { ef:2.5, interval:0, reps:0, due: today, introducedOn: today };
+    bumpNewCount(poolName);
+  });
+  if(freshToUse.length) saveState();
+  let queue = due.concat(freshToUse);
+  if(sessionCap) queue = queue.slice(0, sessionCap);
+  return queue;
+}
+
+function countDue(poolCards, poolName){
+  const day = currentDay();
+  const unlockedIds = {};
+  LESSON_ORDER.forEach(function(id){ if(isUnlocked(id, day)) unlockedIds[id]=true; });
+  const today = todayStr();
+  let due=0, fresh=0;
+  poolCards.forEach(function(c){
+    if(!unlockedIds[c.lessonId]) return;
+    const st = state.cardState[c.id];
+    if(st){ if(st.due<=today) due++; } else { fresh++; }
+  });
+  const allowance = Math.max(0, NEW_CAP[poolName] - countIntroducedToday(poolName));
+  return due + Math.min(fresh, allowance);
+}
+
+function introducedCount(poolCards){
+  return poolCards.filter(function(c){ return !!state.cardState[c.id]; }).length;
+}
+function masteredCount(poolCards){
+  return poolCards.filter(function(c){ const st=state.cardState[c.id]; return st && st.reps>=3 && st.interval>=16; }).length;
+}
+
+/* ================= Quiz generation ================= */
+function buildQuizQuestions(n){
+  const day = currentDay();
+  const unlockedIds = {};
+  LESSON_ORDER.forEach(function(id){ if(isUnlocked(id, day)) unlockedIds[id]=true; });
+  const vocabPool = VOCAB_CARDS.filter(function(c){ return unlockedIds[c.lessonId]; });
+  const sentPool = SENT_CARDS.filter(function(c){ return unlockedIds[c.lessonId]; });
+  const qs = [];
+  let attempts = 0;
+  while(qs.length < n && attempts < n*10){
+    attempts++;
+    const useVocab = Math.random() < 0.6 && vocabPool.length >= 4;
+    if(useVocab){
+      const correct = rand(vocabPool);
+      const distractorPool = vocabPool.filter(function(c){ return c.id!==correct.id && c.en!==correct.en; });
+      if(distractorPool.length < 3) continue;
+      const distractors = sampleN(distractorPool, 3);
+      const dirEnToTl = Math.random() < 0.5;
+      const opts = shuffle([correct].concat(distractors));
+      qs.push({
+        kind:'vocab',
+        prompt: dirEnToTl ? correct.en : correct.tl,
+        promptLabel: dirEnToTl ? 'この意味のタガログ語は？' : 'この単語の意味は？',
+        options: opts.map(function(o){ return dirEnToTl ? o.tl : o.en; }),
+        answer: dirEnToTl ? correct.tl : correct.en
+      });
+    } else {
+      if(sentPool.length < 4) continue;
+      const correct = rand(sentPool);
+      const distractorPool = sentPool.filter(function(c){ return c.id!==correct.id && c.en!==correct.en; });
+      if(distractorPool.length < 3) continue;
+      const distractors = sampleN(distractorPool, 3);
+      const opts = shuffle([correct].concat(distractors));
+      qs.push({
+        kind:'sentence',
+        prompt: correct.tl,
+        promptLabel: 'この文の意味は？',
+        options: opts.map(function(o){ return o.en; }),
+        answer: correct.en
+      });
+    }
+  }
+  return qs;
+}
+
+/* ================= Global UI state ================= */
+let currentTab = 'home';
+let session = null;
+let lessonDetailId = null;
+
+function setTab(t){ currentTab = t; session = null; lessonDetailId = null; render(); window.scrollTo(0,0); }
+
+/* ================= Render root ================= */
+function render(){
+  document.querySelectorAll('nav.bottomnav button').forEach(function(b){
+    b.classList.toggle('active', b.dataset.view === currentTab);
+  });
+  document.getElementById('daylabel').textContent = 'Day ' + Math.min(currentDay(), TOTAL_DAYS) + ' / ' + TOTAL_DAYS;
+  document.getElementById('streakcount').textContent = state.streak.count || 0;
+  const view = document.getElementById('view');
+  let html = '';
+  if(session && session.type==='cards') html = renderCardSession();
+  else if(session && session.type==='quiz') html = renderQuizSession();
+  else if(session && session.type==='talk') html = renderTalkSession();
+  else if(lessonDetailId !== null) html = renderLessonDetail(lessonDetailId);
+  else if(currentTab==='home') html = renderHome();
+  else if(currentTab==='cards') html = renderCardsHome();
+  else if(currentTab==='quiz') html = renderQuizHome();
+  else if(currentTab==='talk') html = renderTalkHome();
+  else if(currentTab==='lessons') html = renderLessonsList();
+  view.innerHTML = html;
+}
+
+/* ================= Home ================= */
+function renderHome(){
+  const day = currentDay();
+  const dueVocab = countDue(VOCAB_CARDS, 'vocab');
+  const dueSent = countDue(SENT_CARDS, 'sent');
+  const newTodayLesson = LESSON_ORDER.filter(function(id){ return unlockDay(id) === Math.min(day, 47); })[0];
+  const pct = Math.min(100, Math.round((day/TOTAL_DAYS)*100));
+  const totalUnlocked = LESSON_ORDER.filter(function(id){ return isUnlocked(id, day); }).length;
+
+  let html = '';
+  html += '<div class="card">';
+  html += '  <h3>学習の進み具合</h3>';
+  html += '  <div class="progressbar"><div style="width:'+pct+'%"></div></div>';
+  html += '  <div class="muted">'+totalUnlocked+' / '+LESSON_ORDER.length+' レッスン解禁 ・ 2ヶ月中 '+Math.min(day,TOTAL_DAYS)+'日目</div>';
+  html += '</div>';
+
+  if(newTodayLesson){
+    const lesson = lessonById(newTodayLesson);
+    html += '<div class="card" style="border-color:var(--accent)">';
+    html += '  <span class="lesson-badge">今日解禁</span>';
+    html += '  <h2>第'+displayNum(lesson.id)+'課: '+escapeHtml(lesson.title)+'</h2>';
+    html += '  <p class="muted">新しい単語 '+ (lesson.v||[]).length +'語・例文 '+(lesson.s||[]).length+'個</p>';
+    html += '  <button class="btn" data-action="openLesson" data-id="'+lesson.id+'">レッスンを見る</button>';
+    html += '</div>';
+  }
+
+  html += '<div class="card">';
+  html += '  <h3>今日のタスク</h3>';
+  html += '  <div class="col">';
+  html += taskRow('🗂️ 単語フラッシュカード', dueVocab>0 ? dueVocab+'枚 待機中' : '本日分は完了！', dueVocab>0, 'cards');
+  html += taskRow('✏️ 文法クイズ', '全'+QUIZ_LEN+'問に挑戦', true, 'quiz');
+  html += taskRow('💬 会話練習', dueSent>0 ? dueSent+'文 待機中' : '本日分は完了！', dueSent>0, 'talk');
+  html += '  </div>';
+  html += '</div>';
+
+  html += '<div class="card">';
+  html += '  <h3>統計</h3>';
+  html += '  <div class="stat-grid">';
+  html += '    <div class="stat-box"><b>'+introducedCount(VOCAB_CARDS)+'</b><span>学習中の単語</span></div>';
+  html += '    <div class="stat-box"><b>'+masteredCount(VOCAB_CARDS)+'</b><span>定着した単語</span></div>';
+  html += '    <div class="stat-box"><b>'+(state.stats.totalReviews||0)+'</b><span>累計レビュー数</span></div>';
+  html += '    <div class="stat-box"><b>'+(state.streak.count||0)+'</b><span>連続学習日数</span></div>';
+  html += '  </div>';
+  html += '</div>';
+
+  html += '<div style="text-align:center;margin-top:6px;"><a href="#" data-action="resetProgress" style="color:var(--text-dim);font-size:12px;">進捗をリセットする</a></div>';
+  return html;
+}
+function taskRow(label, sub, enabled, view){
+  return '<div class="row" style="background:var(--surface2);border-radius:12px;padding:11px 13px;">'
+    + '<div><div style="font-weight:700;font-size:13.5px;">'+label+'</div><div class="muted">'+sub+'</div></div>'
+    + '<button class="btn" style="width:auto;padding:9px 16px;" data-action="goTab" data-id="'+view+'">開始</button>'
+    + '</div>';
+}
+function displayNum(id){ return (id===241) ? '24-2' : id; }
+
+/* ================= Lessons list & detail ================= */
+function renderLessonsList(){
+  const day = currentDay();
+  let html = '<h1 class="page-title">レッスン一覧</h1>';
+  ALL_LESSONS.forEach(function(lesson){
+    const unlocked = isUnlocked(lesson.id, day);
+    html += '<div class="card '+(unlocked?'':'locked')+'" data-action="openLesson" data-id="'+lesson.id+'" style="cursor:pointer;">';
+    html += '<div class="row"><div>';
+    html += '<span class="lesson-badge">第'+displayNum(lesson.id)+'課</span><h2>'+escapeHtml(lesson.title)+'</h2>';
+    html += '</div>';
+    html += unlocked ? '<span style="font-size:20px;">›</span>' : '<span class="lock-tag">🔒 Day '+unlockDay(lesson.id)+'</span>';
+    html += '</div></div>';
+  });
+  return html;
+}
+function renderLessonDetail(id){
+  const lesson = lessonById(id);
+  let html = '<button class="btn secondary" style="width:auto;margin-bottom:12px;" data-action="closeLesson">← 戻る</button>';
+  html += '<h1 class="page-title">第'+displayNum(lesson.id)+'課: '+escapeHtml(lesson.title)+'</h1>';
+  if(lesson.g && lesson.g.length){
+    html += '<div class="card"><h3>文法ノート</h3>';
+    lesson.g.forEach(function(g){ html += '<div class="grammar-note">'+escapeHtml(g)+'</div>'; });
+    html += '</div>';
+  }
+  if(lesson.v && lesson.v.length){
+    html += '<div class="card"><h3>単語 ('+lesson.v.length+')</h3>';
+    lesson.v.forEach(function(pair){
+      html += '<div class="vocab-row"><span class="vocab-tl">'+escapeHtml(pair[0])+'</span><span class="vocab-en">'+escapeHtml(pair[1])+'</span></div>';
+    });
+    html += '</div>';
+  }
+  if(lesson.s && lesson.s.length){
+    html += '<div class="card"><h3>例文 ('+lesson.s.length+')</h3>';
+    lesson.s.forEach(function(pair){
+      html += '<div class="sentence-row"><div class="sentence-tl">'+escapeHtml(pair[0])+'</div><div class="sentence-en">'+escapeHtml(pair[1])+'</div></div>';
+    });
+    html += '</div>';
+  }
+  return html;
+}
+
+/* ================= Cards (flashcards) ================= */
+function renderCardsHome(){
+  const due = countDue(VOCAB_CARDS, 'vocab');
+  let html = '<h1 class="page-title">単語フラッシュカード</h1>';
+  html += '<div class="card">';
+  if(due>0){
+    html += '<p class="muted">今日は '+due+' 枚のカードがあります。SM-2式の間隔反復で、覚えた単語ほど出題間隔が伸びます。</p>';
+    html += '<button class="btn" data-action="startCards">学習を始める ('+due+')</button>';
+  } else {
+    html += '<div class="empty-state"><div class="emoji">✅</div>本日分の単語学習は完了しました！<br>他のメニューにも挑戦してみましょう。</div>';
+  }
+  html += '</div>';
+  html += '<div class="card"><h3>これまでの単語</h3><div class="stat-grid">'
+    + '<div class="stat-box"><b>'+introducedCount(VOCAB_CARDS)+'</b><span>学習開始</span></div>'
+    + '<div class="stat-box"><b>'+masteredCount(VOCAB_CARDS)+'</b><span>定着</span></div>'
+    + '</div></div>';
+  return html;
+}
+function startCardSession(){
+  const queue = buildSessionQueue(VOCAB_CARDS, 'vocab', NEW_CAP.vocab, SESSION_CAP.vocab);
+  if(!queue.length){ render(); return; }
+  session = { type:'cards', queue: queue, idx:0, flipped:false, total: queue.length, done:0 };
+  render();
+}
+function renderCardSession(){
+  if(session.idx >= session.queue.length){
+    const html = '<div class="card"><div class="empty-state"><div class="emoji">🎉</div>今日のカード学習が終わりました！<br>('+session.total+'枚)</div>'
+      + '<button class="btn" data-action="goTab" data-id="home">ホームへ戻る</button></div>';
+    return html;
+  }
+  const c = session.queue[session.idx];
+  const st = state.cardState[c.id];
+  const isNewCard = st && st.reps===0 && !st.lastReview;
+  let html = '';
+  html += '<div class="row" style="margin-bottom:8px;"><span class="muted">'+(session.idx+1)+' / '+session.total+'</span>'
+    + (isNewCard ? '<span class="lesson-badge">新規</span>' : '<span class="muted">復習</span>') + '</div>';
+  html += '<div class="progressbar"><div style="width:'+Math.round((session.idx/session.total)*100)+'%"></div></div>';
+  html += '<div class="flip-card '+(session.flipped?'flipped':'')+'" data-action="flipCard">';
+  html += '  <div class="flip-inner">';
+  html += '    <div class="flip-face front"><span class="ticket-tag">第'+displayNum(c.lessonId)+'課</span><div class="big">'+escapeHtml(c.tl)+'</div><div class="tap-hint">タップして意味を見る</div></div>';
+  html += '    <div class="flip-face back"><span class="ticket-tag">第'+displayNum(c.lessonId)+'課</span><div class="big">'+escapeHtml(c.en)+'</div><div class="small">'+escapeHtml(c.tl)+'</div></div>';
+  html += '  </div>';
+  html += '</div>';
+  if(session.flipped){
+    html += '<div class="btn-row">';
+    html += '<button class="btn bad" data-action="gradeCards" data-id="again">😵 もう一度</button>';
+    html += '<button class="btn good" data-action="gradeCards" data-id="good">🙂 わかった</button>';
+    html += '<button class="btn warn" data-action="gradeCards" data-id="easy">😎 簡単</button>';
+    html += '</div>';
+  } else {
+    html += '<button class="btn secondary" data-action="flipCard">カードをタップ / めくる</button>';
+  }
+  return html;
+}
+
+/* ================= Quiz ================= */
+function renderQuizHome(){
+  let html = '<h1 class="page-title">文法クイズ</h1>';
+  html += '<div class="card"><p class="muted">これまでに解禁したレッスンの単語・例文から、4択問題が出題されます。</p>';
+  html += '<button class="btn" data-action="startQuiz">クイズを始める ('+QUIZ_LEN+'問)</button></div>';
+  return html;
+}
+function startQuizSession(){
+  const qs = buildQuizQuestions(QUIZ_LEN);
+  session = { type:'quiz', queue:qs, idx:0, score:0, answered:false, picked:null };
+  render();
+}
+function renderQuizSession(){
+  if(!session.queue.length){
+    return '<div class="card"><div class="empty-state">まだ十分な単語がありません。フラッシュカードを進めてから挑戦してください。</div>'
+      + '<button class="btn" data-action="goTab" data-id="home">ホームへ戻る</button></div>';
+  }
+  if(session.idx >= session.queue.length){
+    const pct = Math.round((session.score/session.queue.length)*100);
+    return '<div class="card"><div class="empty-state"><div class="emoji">'+(pct>=70?'🏆':'📝')+'</div>'
+      + 'スコア: '+session.score+' / '+session.queue.length+' ('+pct+'%)</div>'
+      + '<button class="btn" data-action="startQuiz">もう一度挑戦</button>'
+      + '<div style="height:8px;"></div>'
+      + '<button class="btn secondary" data-action="goTab" data-id="home">ホームへ戻る</button></div>';
+  }
+  const q = session.queue[session.idx];
+  let html = '<div class="row" style="margin-bottom:8px;"><span class="muted">'+(session.idx+1)+' / '+session.queue.length+'</span><span class="muted">スコア '+session.score+'</span></div>';
+  html += '<div class="card"><h3>'+q.promptLabel+'</h3><h2>'+escapeHtml(q.prompt)+'</h2></div>';
+  q.options.forEach(function(opt, i){
+    let cls = 'quiz-opt';
+    if(session.answered){
+      if(opt === q.answer) cls += ' correct';
+      else if(i === session.picked) cls += ' wrong';
+    }
+    html += '<button class="'+cls+'" data-action="answerQuiz" data-id="'+i+'" '+(session.answered?'disabled':'')+'>'+escapeHtml(opt)+'</button>';
+  });
+  if(session.answered){
+    html += '<button class="btn" data-action="nextQuiz">次へ →</button>';
+  }
+  return html;
+}
+
+/* ================= Talk (conversation practice) ================= */
+function renderTalkHome(){
+  const due = countDue(SENT_CARDS, 'sent');
+  let html = '<h1 class="page-title">会話練習</h1>';
+  html += '<div class="card">';
+  if(due>0){
+    html += '<p class="muted">日本語(英語)を見て、タガログ語で言えるか練習します。答えを見てから自己採点してください。</p>';
+    html += '<button class="btn" data-action="startTalk">練習を始める ('+due+')</button>';
+  } else {
+    html += '<div class="empty-state"><div class="emoji">✅</div>本日分の会話練習は完了しました！</div>';
+  }
+  html += '</div>';
+  return html;
+}
+function startTalkSession(){
+  const queue = buildSessionQueue(SENT_CARDS, 'sent', NEW_CAP.sent, SESSION_CAP.sent);
+  if(!queue.length){ render(); return; }
+  session = { type:'talk', queue: queue, idx:0, flipped:false, total: queue.length };
+  render();
+}
+function renderTalkSession(){
+  if(session.idx >= session.queue.length){
+    return '<div class="card"><div class="empty-state"><div class="emoji">🎉</div>今日の会話練習が終わりました！('+session.total+'文)</div>'
+      + '<button class="btn" data-action="goTab" data-id="home">ホームへ戻る</button></div>';
+  }
+  const c = session.queue[session.idx];
+  let html = '<div class="row" style="margin-bottom:8px;"><span class="muted">'+(session.idx+1)+' / '+session.total+'</span></div>';
+  html += '<div class="progressbar"><div style="width:'+Math.round((session.idx/session.total)*100)+'%"></div></div>';
+  html += '<div class="flip-card '+(session.flipped?'flipped':'')+'" data-action="flipTalk">';
+  html += '  <div class="flip-inner">';
+  html += '    <div class="flip-face front"><span class="ticket-tag">第'+displayNum(c.lessonId)+'課</span><h3 class="muted" style="margin-top:0;">タガログ語で言うと？</h3><div class="big" style="font-size:19px;">'+escapeHtml(c.en)+'</div><div class="tap-hint">タップして答えを見る</div></div>';
+  html += '    <div class="flip-face back"><span class="ticket-tag">第'+displayNum(c.lessonId)+'課</span><div class="big" style="font-size:20px;">'+escapeHtml(c.tl)+'</div><div class="small">'+escapeHtml(c.en)+'</div></div>';
+  html += '  </div>';
+  html += '</div>';
+  if(session.flipped){
+    html += '<div class="btn-row">';
+    html += '<button class="btn bad" data-action="gradeTalk" data-id="again">😵 言えなかった</button>';
+    html += '<button class="btn good" data-action="gradeTalk" data-id="good">🙂 言えた</button>';
+    html += '<button class="btn warn" data-action="gradeTalk" data-id="easy">😎 完璧</button>';
+    html += '</div>';
+  } else {
+    html += '<button class="btn secondary" data-action="flipTalk">タップして答えを見る</button>';
+  }
+  return html;
+}
+
+/* ================= Event delegation ================= */
+document.getElementById('view').addEventListener('click', function(e){
+  const t = e.target.closest('[data-action]');
+  if(!t) return;
+  e.preventDefault();
+  const action = t.dataset.action;
+  const id = t.dataset.id;
+  if(action==='goTab'){ setTab(id); }
+  else if(action==='openLesson'){ lessonDetailId = Number(id); session=null; render(); window.scrollTo(0,0); }
+  else if(action==='closeLesson'){ lessonDetailId = null; render(); }
+  else if(action==='startCards'){ startCardSession(); }
+  else if(action==='flipCard'){ session.flipped = !session.flipped; render(); }
+  else if(action==='gradeCards'){
+    const c = session.queue[session.idx];
+    gradeCard(c.id, id);
+    session.idx += 1; session.flipped = false; render();
+  }
+  else if(action==='startQuiz'){ startQuizSession(); }
+  else if(action==='answerQuiz'){
+    const q = session.queue[session.idx];
+    session.picked = Number(id);
+    session.answered = true;
+    if(q.options[session.picked] === q.answer) session.score += 1;
+    touchStreak(); saveState();
+    render();
+  }
+  else if(action==='nextQuiz'){ session.idx += 1; session.answered=false; session.picked=null; render(); }
+  else if(action==='startTalk'){ startTalkSession(); }
+  else if(action==='flipTalk'){ session.flipped = !session.flipped; render(); }
+  else if(action==='gradeTalk'){
+    const c = session.queue[session.idx];
+    gradeCard(c.id, id);
+    session.idx += 1; session.flipped = false; render();
+  }
+  else if(action==='resetProgress'){
+    if(confirm('すべての学習進捗をリセットします。よろしいですか？')){
+      localStorage.removeItem(STORAGE_KEY);
+      loadState();
+      setTab('home');
+    }
+  }
+});
+document.querySelectorAll('nav.bottomnav button').forEach(function(btn){
+  btn.addEventListener('click', function(){ setTab(btn.dataset.view); });
+});
+
+/* ================= Init ================= */
+loadState();
+const isFirstRun = state.firstRun;
+if(state.firstRun){ delete state.firstRun; saveState(); }
+render();
+if(isFirstRun){
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = '<div class="modal-box">'
+    + '<h2 style="margin-top:0;">ようこそ！タガログ語 2ヶ月チャレンジ</h2>'
+    + '<p class="muted" style="line-height:1.8;">Riri先生のテキスト全31課をもとに、60日間で毎日少しずつ学習します。'
+    + '<br><br>①<b>単語フラッシュカード</b>：間隔反復で効率よく暗記<br>②<b>文法クイズ</b>：4択で理解度チェック<br>③<b>会話練習</b>：日本語→タガログ語の瞬発力トレーニング'
+    + '<br><br>レッスンは約1.5日に1課ずつ解禁され、47日目までに全課が解禁、残りの期間は総復習にあてます。毎日開くだけでOKです！</p>'
+    + '<button class="btn" id="closeOnboarding">はじめる</button>'
+    + '</div>';
+  document.body.appendChild(backdrop);
+  document.getElementById('closeOnboarding').addEventListener('click', function(){ backdrop.remove(); });
+}
+</script>
+</body>
+</html>
