@@ -1200,14 +1200,24 @@ ALL_LESSONS.forEach(function(lesson){
   });
 });
 const TOTAL_DAYS = 60;
-const NEW_CAP = { vocab: 18, sent: 8 };
+/* Tuned so a daily learner naturally takes ~60 days to introduce all content
+   (533 vocab / 9 per day ~= 59 days, 303 sentences / 5 per day ~= 61 days) -
+   this keeps the "2-month challenge" honest even for a very motivated learner,
+   without ever hard-blocking on the calendar (see isUnlocked above). */
+const NEW_CAP = { vocab: 9, sent: 5 };
 const SESSION_CAP = { vocab: 30, sent: 12 };
 const QUIZ_LEN = 10;
 
 function lessonById(id){ return ALL_LESSONS.filter(function(l){ return l.id===id; })[0]; }
 function lessonIdx(id){ return LESSON_ORDER.indexOf(id); }
-/* targetDay: a recommended-pace label only (shown in the Lessons list), not a hard gate. */
-function targetDay(id){ return Math.floor(lessonIdx(id)*1.5)+1; }
+/* targetDay: a recommended-pace label only (shown in the Lessons list), not a hard gate.
+   Spread linearly across the full TOTAL_DAYS (60) so lesson 1 -> day 1 and the last
+   lesson -> day 60 - a genuine 2-month pace, not one that finishes with weeks to spare. */
+function targetDay(id){
+  const idx = lessonIdx(id);
+  const lastIdx = LESSON_ORDER.length - 1;
+  return Math.round(idx * (TOTAL_DAYS-1) / lastIdx) + 1;
+}
 /* isUnlocked: progress-based. Lesson k unlocks once every vocab card of lessons 0..k-1
    has been introduced into the flashcard deck at least once (so eager study, not the
    calendar, is what advances you - the old version blocked lesson 2+ until a real day passed). */
@@ -1725,7 +1735,7 @@ if(isFirstRun){
     + '<h2 style="margin-top:0;">ようこそ！タガログ語 2ヶ月チャレンジ</h2>'
     + '<p class="muted" style="line-height:1.8;">Riri先生のテキスト全31課をもとに、60日間で毎日少しずつ学習します。'
     + '<br><br>①<b>単語フラッシュカード</b>：間隔反復で効率よく暗記<br>②<b>文法クイズ</b>：4択で理解度チェック<br>③<b>会話練習</b>：日本語→タガログ語の瞬発力トレーニング'
-    + '<br><br>レッスンは「前のレッスンの単語を一通り学習し終える」と次が解禁される仕組みです。目安は約1.5日に1課ですが、たくさん学習すればどんどん先に進めます。2ヶ月かけて無理なく全31課(32レッスン)を学び切るペースです。</p>'
+    + '<br><br>レッスンは「前のレッスンの単語を一通り学習し終える」と次が解禁される仕組みです。1日に学べる新出単語には上限があるので(単語9個・例文5個/日)、毎日コツコツ続けると60日でちょうど全31課(32レッスン)を学び終えるペースになります。</p>'
     + '<button class="btn" id="closeOnboarding">はじめる</button>'
     + '</div>';
   document.body.appendChild(backdrop);
